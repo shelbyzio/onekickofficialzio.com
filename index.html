@@ -66,7 +66,7 @@
                     snapshot.forEach(doc => data.push({ id: doc.id, ...doc.data() }));
                     data.sort((a, b) => b.timestamp - a.timestamp);
                     callback(data);
-                });
+                }, (error) => console.error("Snapshot Error:", error));
             }
         };
     </script>
@@ -76,8 +76,7 @@
         
         :root {
             --neon-pink: #f43f5e;
-            --neon-blue: #0ea5e9;
-            --neon-emerald: #10b981;
+            --neon-blue: #3b82f6;
             --tg-blue: #229ED9;
         }
 
@@ -90,6 +89,7 @@
         }
 
         .neon-text-pink { text-shadow: 0 0 10px rgba(244, 63, 94, 0.8); }
+        
         .glass-card { 
             background: rgba(255, 255, 255, 0.02); 
             backdrop-filter: blur(15px); 
@@ -101,62 +101,60 @@
             box-shadow: 0 0 20px rgba(244, 63, 94, 0.4);
         }
 
-        .tg-gradient-btn {
-            background: linear-gradient(135deg, #229ED9 0%, #1274a3 100%);
-            box-shadow: 0 0 15px rgba(34, 158, 217, 0.3);
-        }
-
         .input-field { 
             background: rgba(255, 255, 255, 0.03); 
             border: 1px solid rgba(255, 255, 255, 0.08); 
             transition: 0.3s;
+            color: white;
         }
         .input-field:focus { border-color: var(--neon-pink); outline: none; }
         
-        .tab-btn { color: #444; transition: 0.4s; font-weight: bold; border-bottom: 2px solid transparent; }
+        .tab-btn { color: #555; transition: 0.4s; font-weight: bold; border-bottom: 2px solid transparent; }
         .tab-btn.active { border-bottom: 2px solid var(--neon-pink); color: var(--neon-pink); }
         
         .sub-tab-btn { padding: 8px 16px; border-radius: 30px; font-size: 9px; font-weight: bold; transition: 0.3s; background: rgba(255,255,255,0.03); color: #555; border: 1px solid rgba(255,255,255,0.05); }
-        .sub-tab-btn.active { background: rgba(14, 165, 233, 0.1); color: var(--neon-blue); border-color: rgba(14, 165, 233, 0.4); }
+        .sub-tab-btn.active { background: rgba(59, 130, 246, 0.1); color: var(--neon-blue); border-color: rgba(59, 130, 246, 0.4); }
 
-        /* Updated Blue Accumulator Theme */
-        .acc-card { border: 1px solid rgba(14, 165, 233, 0.3) !important; background: linear-gradient(180deg, rgba(14, 165, 233, 0.05) 0%, transparent 100%); }
-        .acc-won { border: 1px solid var(--neon-emerald) !important; box-shadow: 0 0 30px rgba(16, 185, 129, 0.15); background: linear-gradient(180deg, rgba(16, 185, 129, 0.05) 0%, transparent 100%); }
+        /* Live Highlight UI */
+        .live-code-badge {
+            background: linear-gradient(135deg, #f43f5e 0%, #be123c 100%);
+            box-shadow: 0 0 20px rgba(244, 63, 94, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            animation: glow-pulse 2s infinite ease-in-out;
+        }
+
+        @keyframes glow-pulse {
+            0% { box-shadow: 0 0 5px rgba(244, 63, 94, 0.4); }
+            50% { box-shadow: 0 0 20px rgba(244, 63, 94, 0.8); }
+            100% { box-shadow: 0 0 5px rgba(244, 63, 94, 0.4); }
+        }
+
+        .live-dot { height: 8px; width: 8px; background-color: #f43f5e; border-radius: 50%; display: inline-block; animation: dot-blink 1.5s infinite; }
+        @keyframes dot-blink { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.3; transform: scale(1.2); } 100% { opacity: 1; transform: scale(1); } }
         
-        .acc-item { background: rgba(255,255,255,0.02); border-left: 3px solid rgba(255,255,255,0.1); }
-        .acc-item-win { border-left-color: var(--neon-emerald); background: rgba(16, 185, 129, 0.05); }
-        .acc-item-loss { border-left-color: var(--neon-pink); background: rgba(244, 63, 94, 0.05); }
-
-        .badge-win { background: #10b981; color: white; padding: 4px 10px; border-radius: 8px; font-size: 9px; font-weight: 900; letter-spacing: 1px; }
-        .badge-loss { background: #f43f5e; color: white; padding: 4px 10px; border-radius: 8px; font-size: 9px; font-weight: 900; letter-spacing: 1px; }
-
-        .date-divider { display: flex; align-items: center; gap: 10px; margin: 25px 0 15px 0; }
-        .date-divider span { font-size: 0.7rem; font-weight: bold; color: var(--neon-blue); background: rgba(14, 165, 233, 0.08); padding: 4px 12px; border-radius: 50px; }
-        .date-divider::before, .date-divider::after { content: ""; flex: 1; height: 1px; background: rgba(255,255,255,0.05); }
-
-        /* Updated Odds Badge for Blue Theme */
-        .big-odds-badge {
-            background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
-            color: #fff;
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 16px;
+        /* Accumulator UI */
+        .odds-badge {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.6);
+            padding: 8px 16px;
+            border-radius: 50px;
             font-weight: 900;
-            box-shadow: 0 0 15px rgba(14, 165, 233, 0.4);
-            display: inline-block;
+            color: white;
+            font-size: 14px;
         }
 
-        /* Betting Code Badge */
-        .bet-code-box {
-            background: rgba(14, 165, 233, 0.1);
-            border: 1px dashed rgba(14, 165, 233, 0.4);
-            cursor: pointer;
-            transition: 0.3s;
+        .acc-item {
+            background: rgba(255, 255, 255, 0.02);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            padding: 14px;
+            border-radius: 12px;
+            margin-bottom: 8px;
         }
-        .bet-code-box:active { transform: scale(0.95); background: rgba(14, 165, 233, 0.2); }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 </head>
-<body class="min-h-screen pb-20">
+<body class="min-h-screen pb-32">
 
     <!-- Header -->
     <div class="sticky top-0 z-50 bg-[#050505]/80 backdrop-blur-xl border-b border-white/5 px-4 py-4">
@@ -169,48 +167,44 @@
                     <h1 class="text-lg font-black text-white uppercase tracking-tighter neon-text-pink">ONE KICK</h1>
                 </div>
             </div>
-            <button onclick="toggleAdminView()" class="text-gray-600 px-3"><i class="fas fa-user-shield text-sm"></i></button>
+            <button onclick="toggleAdminView()" class="text-gray-800 px-3"><i class="fas fa-user-shield text-sm"></i></button>
         </div>
     </div>
 
-    <!-- Main Navigation -->
-    <div class="max-w-xl mx-auto flex border-b border-white/5 mb-6">
-        <button id="tabCalculator" onclick="switchView('calculator')" class="tab-btn flex-1 py-4 text-[10px] uppercase tracking-widest active">Calculator</button>
-        <button id="tabMatches" onclick="switchView('matches')" class="tab-btn flex-1 py-4 text-[10px] uppercase tracking-widest">Daily Tips</button>
+    <!-- Navigation -->
+    <div class="max-w-xl mx-auto flex border-b border-white/5 mb-6 overflow-x-auto no-scrollbar">
+        <button id="tabCalculator" onclick="switchView('calculator')" class="tab-btn flex-1 min-w-[100px] py-4 text-[10px] uppercase tracking-widest active">Calculator</button>
+        <button id="tabMatches" onclick="switchView('matches')" class="tab-btn flex-1 min-w-[100px] py-4 text-[10px] uppercase tracking-widest">Daily Tips</button>
+        <button id="tabLive" onclick="switchView('live')" class="tab-btn flex-1 min-w-[100px] py-4 text-[10px] uppercase tracking-widest flex items-center justify-center gap-2">
+            <span class="live-dot"></span> LIVE
+        </button>
     </div>
 
     <div class="max-w-xl mx-auto px-4">
         
-        <!-- CALCULATOR VIEW -->
+        <!-- CALCULATOR -->
         <div id="calculatorView" class="space-y-6">
             <div class="glass-card rounded-3xl p-6 space-y-4">
-                <input type="text" id="leagueName" placeholder="League Name" class="input-field w-full px-5 py-4 rounded-2xl text-white text-sm">
+                <input type="text" id="leagueName" placeholder="League Name" class="input-field w-full px-5 py-4 rounded-2xl text-sm">
                 <div class="grid grid-cols-2 gap-3">
-                    <input type="text" id="homeTeam" placeholder="Home Team" class="input-field w-full px-4 py-4 rounded-2xl text-white text-sm">
-                    <input type="text" id="awayTeam" placeholder="Away Team" class="input-field w-full px-4 py-4 rounded-2xl text-white text-sm">
+                    <input type="text" id="homeTeam" placeholder="Home Team" class="input-field w-full px-4 py-4 rounded-2xl text-sm">
+                    <input type="text" id="awayTeam" placeholder="Away Team" class="input-field w-full px-4 py-4 rounded-2xl text-sm">
                 </div>
-                <select id="favTeam" class="input-field w-full px-5 py-4 rounded-2xl text-white text-sm">
+                <select id="favTeam" class="input-field w-full px-5 py-4 rounded-2xl text-sm bg-black">
                     <option value="home">Home (ကြေးပေး)</option>
                     <option value="away">Away (ကြေးပေး)</option>
                 </select>
                 <div class="grid grid-cols-2 gap-3">
-                    <input type="text" id="handicap" placeholder="Handicap" class="input-field w-full px-4 py-4 rounded-2xl text-white text-sm">
-                    <input type="text" id="total" placeholder="OU Total" class="input-field w-full px-4 py-4 rounded-2xl text-white text-sm">
+                    <input type="text" id="handicap" placeholder="Handicap" class="input-field w-full px-4 py-4 rounded-2xl text-sm">
+                    <input type="text" id="total" placeholder="OU Total" class="input-field w-full px-4 py-4 rounded-2xl text-sm">
                 </div>
-                <button onclick="predictMatch()" class="red-gradient-btn w-full py-4 rounded-2xl text-white font-black uppercase text-xs tracking-widest mb-4">Predict Result</button>
+                <button onclick="predictMatch()" class="red-gradient-btn w-full py-4 rounded-2xl text-white font-black uppercase text-xs tracking-widest">Predict Result</button>
                 
-                <a href="https://t.me/onekick_ofc" target="_blank" class="tg-gradient-btn flex items-center justify-between px-6 py-4 rounded-2xl group transition-all duration-300">
-                    <div class="flex items-center gap-4">
-                        <div class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center">
-                            <i class="fab fa-telegram text-white text-xl"></i>
-                        </div>
-                        <div>
-                            <p class="text-[10px] text-white/70 font-bold uppercase tracking-widest">Join Telegram</p>
-                            <p class="text-xs font-black text-white">Channel ကို Join ရန် နှိပ်ပါ</p>
-                        </div>
-                    </div>
-                    <i class="fas fa-chevron-right text-white/30 group-hover:translate-x-1 transition-transform"></i>
-                </a>
+                <div class="pt-2">
+                    <a href="https://t.me/onekick_ofc" target="_blank" class="flex items-center justify-center gap-3 w-full py-4 rounded-2xl text-white font-black uppercase text-[10px] tracking-widest" style="background: linear-gradient(135deg, #229ED9 0%, #1a83b8 100%);">
+                        <i class="fab fa-telegram text-lg"></i> JOIN TELEGRAM
+                    </a>
+                </div>
             </div>
 
             <div id="resultContainer" class="hidden">
@@ -221,30 +215,37 @@
             </div>
         </div>
 
-        <!-- DAILY TIPS VIEW -->
+        <!-- DAILY TIPS -->
         <div id="matchesView" class="hidden">
             <div class="flex justify-center gap-2 mb-6">
                 <button id="filterSingle" onclick="setTipType('single')" class="sub-tab-btn active">SINGLE</button>
                 <button id="filterAccumulator" onclick="setTipType('accumulator')" class="sub-tab-btn">ACCUMULATOR</button>
                 <button id="filterHistory" onclick="setTipType('history')" class="sub-tab-btn">HISTORY</button>
             </div>
-            <div id="tipsContent" class="space-y-5"></div>
+            <div id="tipsContent" class="space-y-6"></div>
         </div>
 
-        <!-- ADMIN PANEL VIEW -->
+        <!-- LIVE -->
+        <div id="liveView" class="hidden">
+            <div id="liveTipsContent" class="space-y-5"></div>
+        </div>
+
+        <!-- ADMIN -->
         <div id="adminView" class="hidden space-y-6">
             <div class="glass-card rounded-3xl p-6 space-y-4 border-dashed border-rose-500/30">
                 <h2 class="font-black text-[11px] uppercase tracking-widest text-rose-500">Post New Tip</h2>
-                
-                <select id="adminType" onchange="toggleAdminForm()" class="input-field w-full px-4 py-3 rounded-xl text-xs text-white">
+                <select id="adminType" onchange="toggleAdminForm()" class="input-field w-full px-4 py-3 rounded-xl text-xs bg-black">
                     <option value="single">Single Tip</option>
-                    <option value="accumulator">Accumulator (4 Matches)</option>
+                    <option value="accumulator">Accumulator</option>
+                    <option value="live">Live Bet Tip</option>
                 </select>
 
-                <div id="singleForm" class="space-y-3">
+                <div id="tipInputs" class="space-y-3">
                     <input type="text" id="adminLeague" placeholder="League" class="input-field w-full px-4 py-3 rounded-xl text-sm">
                     <input type="text" id="adminTitle" placeholder="Match Title" class="input-field w-full px-4 py-3 rounded-xl text-sm">
-                    <input type="text" id="adminPick" placeholder="Prediction" class="input-field w-full px-4 py-3 rounded-xl text-sm">
+                    <input type="text" id="adminPick" placeholder="Pick" class="input-field w-full px-4 py-3 rounded-xl text-sm">
+                    <input type="text" id="adminLiveCode" placeholder="Live 1XBet Code (Optional)" class="hidden input-field w-full px-4 py-3 rounded-xl text-sm">
+                    <input type="text" id="adminBetAmount" placeholder="Amount (e.g. 50000 MMK)" class="hidden input-field w-full px-4 py-3 rounded-xl text-sm">
                 </div>
 
                 <div id="accForm" class="hidden space-y-4">
@@ -252,11 +253,11 @@
                         <input type="text" id="acc1betCode" placeholder="1XBet Code" class="input-field w-full px-4 py-3 rounded-xl text-xs">
                         <input type="text" id="accOdds" placeholder="Total Odds" class="input-field w-full px-4 py-3 rounded-xl text-xs">
                     </div>
-                    <!-- Match Inputs 1-4 -->
-                    <div class="space-y-2 p-3 bg-white/5 rounded-2xl"><input type="text" id="m1_title" placeholder="Teams 1" class="input-field w-full px-3 py-2 rounded-lg text-xs"><input type="text" id="m1_pick" placeholder="Pick 1" class="input-field w-full px-3 py-2 rounded-lg text-xs"></div>
-                    <div class="space-y-2 p-3 bg-white/5 rounded-2xl"><input type="text" id="m2_title" placeholder="Teams 2" class="input-field w-full px-3 py-2 rounded-lg text-xs"><input type="text" id="m2_pick" placeholder="Pick 2" class="input-field w-full px-3 py-2 rounded-lg text-xs"></div>
-                    <div class="space-y-2 p-3 bg-white/5 rounded-2xl"><input type="text" id="m3_title" placeholder="Teams 3" class="input-field w-full px-3 py-2 rounded-lg text-xs"><input type="text" id="m3_pick" placeholder="Pick 3" class="input-field w-full px-3 py-2 rounded-lg text-xs"></div>
-                    <div class="space-y-2 p-3 bg-white/5 rounded-2xl"><input type="text" id="m4_title" placeholder="Teams 4" class="input-field w-full px-3 py-2 rounded-lg text-xs"><input type="text" id="m4_pick" placeholder="Pick 4" class="input-field w-full px-3 py-2 rounded-lg text-xs"></div>
+                    <div id="accItemsContainer" class="space-y-2">
+                        <input type="text" placeholder="Match 1 - Pick" class="acc-item-val input-field w-full px-3 py-2 rounded-lg text-xs">
+                        <input type="text" placeholder="Match 2 - Pick" class="acc-item-val input-field w-full px-3 py-2 rounded-lg text-xs">
+                        <input type="text" placeholder="Match 3 - Pick" class="acc-item-val input-field w-full px-3 py-2 rounded-lg text-xs">
+                    </div>
                 </div>
 
                 <button onclick="saveAdminMatch()" class="w-full bg-rose-600 py-4 rounded-xl font-black text-xs uppercase tracking-widest">Post Now</button>
@@ -265,10 +266,7 @@
         </div>
     </div>
 
-    <!-- Notification Toast -->
-    <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 bg-sky-600 text-white px-6 py-3 rounded-full text-xs font-bold opacity-0 transition-opacity pointer-events-none z-[100]">
-        Copied to clipboard!
-    </div>
+    <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 bg-rose-600 text-white px-6 py-3 rounded-full text-[10px] font-bold opacity-0 transition-all duration-300 pointer-events-none z-[100] uppercase tracking-widest">Code Copied!</div>
 
     <script>
         let matches = [];
@@ -278,24 +276,29 @@
         window.onload = () => { if (window.fb) window.fb.listenToMatches(data => { matches = data; renderAll(); }); };
 
         function switchView(view) {
-            document.querySelectorAll('#calculatorView, #matchesView, #adminView').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('#calculatorView, #matchesView, #liveView, #adminView').forEach(el => el.classList.add('hidden'));
             document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
             if(view === 'calculator') { document.getElementById('calculatorView').classList.remove('hidden'); document.getElementById('tabCalculator').classList.add('active'); }
             else if(view === 'matches') { document.getElementById('matchesView').classList.remove('hidden'); document.getElementById('tabMatches').classList.add('active'); }
+            else if(view === 'live') { document.getElementById('liveView').classList.remove('hidden'); document.getElementById('tabLive').classList.add('active'); }
             else if(view === 'admin') document.getElementById('adminView').classList.remove('hidden');
-        }
-
-        function toggleAdminForm() {
-            const type = document.getElementById('adminType').value;
-            document.getElementById('singleForm').classList.toggle('hidden', type !== 'single');
-            document.getElementById('accForm').classList.toggle('hidden', type !== 'accumulator');
         }
 
         function setTipType(type) {
             currentTipType = type;
-            document.querySelectorAll('.sub-tab-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById('filter' + type.charAt(0).toUpperCase() + type.slice(1)).classList.add('active');
+            document.querySelectorAll('.sub-tab-btn').forEach(btn => btn.classList.remove('active'));
+            if(type === 'single') document.getElementById('filterSingle').classList.add('active');
+            else if(type === 'accumulator') document.getElementById('filterAccumulator').classList.add('active');
+            else if(type === 'history') document.getElementById('filterHistory').classList.add('active');
             renderAll();
+        }
+
+        function toggleAdminForm() {
+            const type = document.getElementById('adminType').value;
+            document.getElementById('tipInputs').classList.toggle('hidden', type === 'accumulator');
+            document.getElementById('accForm').classList.toggle('hidden', type !== 'accumulator');
+            document.getElementById('adminBetAmount').classList.toggle('hidden', type !== 'live');
+            document.getElementById('adminLiveCode').classList.toggle('hidden', type !== 'live');
         }
 
         function toggleAdminView() { if(prompt("Admin Password:") === ADMIN_PASS) switchView('admin'); }
@@ -303,106 +306,151 @@
         async function saveAdminMatch() {
             const type = document.getElementById('adminType').value;
             let data = { type, time: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) };
-            if(type === 'single') {
+            if(type !== 'accumulator') {
                 data.league = document.getElementById('adminLeague').value;
                 data.title = document.getElementById('adminTitle').value;
                 data.pick = document.getElementById('adminPick').value;
-                if(!data.title || !data.pick) return alert("Please fill title and pick");
+                if(type === 'live') {
+                    data.betAmount = document.getElementById('adminBetAmount').value;
+                    data.liveCode = document.getElementById('adminLiveCode').value;
+                }
             } else {
                 data.betCode = document.getElementById('acc1betCode').value;
                 data.odds = document.getElementById('accOdds').value;
-                data.items = [
-                    { title: document.getElementById('m1_title').value, pick: document.getElementById('m1_pick').value, res: '' },
-                    { title: document.getElementById('m2_title').value, pick: document.getElementById('m2_pick').value, res: '' },
-                    { title: document.getElementById('m3_title').value, pick: document.getElementById('m3_pick').value, res: '' },
-                    { title: document.getElementById('m4_title').value, pick: document.getElementById('m4_pick').value, res: '' }
-                ].filter(i => i.title && i.pick);
-                
-                if(data.items.length === 0) return alert("Please fill at least one match in accumulator");
+                data.items = [];
+                document.querySelectorAll('.acc-item-val').forEach(input => {
+                    if(input.value) data.items.push({ title: input.value.split('-')[0], pick: input.value.split('-')[1] || '' });
+                });
             }
             await window.fb.saveMatch(data);
-            alert("Posted!");
+            alert("Success!");
+            renderAll();
         }
 
         function copyCode(code) {
+            if(!code) return;
             const el = document.createElement('textarea');
             el.value = code;
             document.body.appendChild(el);
             el.select();
             document.execCommand('copy');
             document.body.removeChild(el);
-            
-            const toast = document.getElementById('toast');
-            toast.style.opacity = '1';
-            setTimeout(() => toast.style.opacity = '0', 2000);
-        }
-
-        function renderAll() {
-            const list = document.getElementById('tipsContent');
-            let filtered = (currentTipType === 'history') ? 
-                matches.filter(m => m.result) : 
-                matches.filter(m => !m.result && (m.type === currentTipType || (!m.type && currentTipType === 'single')));
-            
-            let html = '';
-            let lastDate = '';
-            filtered.forEach(m => {
-                if(m.type === 'accumulator' && (!m.items || m.items.length === 0)) return;
-                if((!m.type || m.type === 'single') && !m.title) return;
-
-                if (m.date !== lastDate) { html += `<div class="date-divider"><span>${m.date || 'Today'}</span></div>`; lastDate = m.date; }
-                html += (m.type === 'accumulator') ? createAccCard(m) : createSingleCard(m);
-            });
-            list.innerHTML = html || `<div class="text-center py-20 opacity-20 text-[10px] uppercase tracking-widest">No Tips</div>`;
-            renderAdminList();
+            const t = document.getElementById('toast');
+            t.style.opacity = '1';
+            setTimeout(() => t.style.opacity = '0', 2000);
         }
 
         function createSingleCard(m) {
-            const resClass = m.result === 'WIN' ? 'border-emerald-500/40 bg-emerald-500/10' : m.result === 'LOSS' ? 'border-rose-500/40 bg-rose-500/10' : 'border-sky-500/20';
-            return `<div class="glass-card rounded-3xl p-6 border ${resClass} mb-4">
+            const resClass = m.result === 'WIN' ? 'border-emerald-500/40 bg-emerald-500/5' : m.result === 'LOSS' ? 'border-rose-500/40 bg-rose-500/5' : 'border-sky-500/10';
+            return `<div class="glass-card rounded-3xl p-6 border ${resClass}">
                 <div class="flex justify-between items-start mb-4">
-                    <span class="text-[9px] font-black uppercase text-sky-500 tracking-widest">${m.league || 'Single'}</span>
-                    ${m.result ? `<span class="${m.result === 'WIN' ? 'badge-win' : 'badge-loss'}">${m.result}</span>` : ''}
+                    <span class="text-[9px] font-black uppercase text-sky-500 tracking-widest">${m.league || 'SINGLE'}</span>
+                    ${m.result ? `<span class="px-3 py-1 rounded-lg font-black text-[9px] ${m.result === 'WIN' ? 'bg-emerald-500' : 'bg-rose-500'}">${m.result}</span>` : ''}
                 </div>
-                <h3 class="font-bold mb-4">${m.title}</h3>
+                <h3 class="font-bold mb-4 text-white">${m.title}</h3>
                 <div class="bg-black/40 rounded-2xl p-4 text-center border border-white/5"><span class="text-sky-400 font-black">${m.pick}</span></div>
             </div>`;
         }
 
         function createAccCard(m) {
-            const allWon = m.result === 'WIN';
-            return `<div class="glass-card rounded-3xl p-6 border ${allWon ? 'border-emerald-500/40' : 'acc-card'} mb-4">
+            return `<div class="glass-card rounded-[2.5rem] p-6 mb-6" style="background: linear-gradient(180deg, #050505 0%, rgba(10,20,40,0.5) 100%); border-color: rgba(59,130,246,0.2);">
                 <div class="flex justify-between items-center mb-6">
-                    <span class="text-[9px] font-black uppercase text-sky-500 tracking-widest">Accumulator</span>
-                    <div class="text-center">
-                        <p class="text-[8px] text-white/50 uppercase font-bold mb-1">Total Odds</p>
-                        <span class="big-odds-badge">@${m.odds || '0.00'}</span>
+                    <span class="text-[10px] font-black uppercase text-sky-400 tracking-widest">ACCUMULATOR</span>
+                    <div class="odds-badge">@Odds : ${m.odds || '0.00'}</div>
+                </div>
+
+                <div class="bg-white/5 border border-dashed border-sky-500/30 rounded-2xl p-4 mb-6 cursor-pointer" onclick="copyCode('${m.betCode}')">
+                    <p class="text-[8px] font-black text-sky-500 uppercase mb-1 tracking-wider">1XBet Booking Code</p>
+                    <div class="flex justify-between items-center">
+                        <span class="text-lg font-black text-white tracking-widest uppercase">${m.betCode || 'N/A'}</span>
+                        <i class="far fa-copy text-sky-500 text-sm"></i>
                     </div>
                 </div>
 
-                ${m.betCode ? `
-                <div onclick="copyCode('${m.betCode}')" class="bet-code-box rounded-2xl p-4 mb-6 flex items-center justify-between group">
-                    <div>
-                        <p class="text-[8px] text-sky-500 font-black uppercase tracking-widest mb-1">1XBet Code (Tap to Copy)</p>
-                        <p class="text-xl font-black text-white tracking-tighter">${m.betCode}</p>
+                <div class="space-y-2">
+                    ${(m.items || []).map(it => `
+                        <div class="acc-item">
+                            <p class="text-[12px] font-bold text-white">${it.title}</p>
+                            <p class="text-[11px] font-black text-sky-400">${it.pick}</p>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>`;
+        }
+
+        function createLiveCard(m) {
+            return `<div class="glass-card rounded-[2.5rem] p-6 border-2 border-rose-500/30 bg-gradient-to-br from-rose-900/10 via-black to-black">
+                <div class="flex justify-between items-center mb-5">
+                    <div class="flex items-center gap-2">
+                        <span class="live-dot"></span>
+                        <span class="text-[10px] font-black uppercase text-rose-500 tracking-widest">LIVE BETTING</span>
                     </div>
-                    <i class="fas fa-copy text-sky-500/50 group-hover:text-sky-500 transition-colors"></i>
+                    <span class="text-[9px] text-white/40 font-bold">${m.time}</span>
+                </div>
+                
+                <h3 class="font-black mb-1 text-white text-xl leading-tight">${m.title}</h3>
+                <p class="text-[10px] text-white/40 font-bold mb-5 uppercase tracking-wide">${m.league}</p>
+
+                <div class="bg-rose-600/10 rounded-3xl p-6 text-center border border-rose-500/20 mb-5">
+                    <p class="text-[9px] text-rose-400 font-black uppercase mb-2 tracking-widest">Our Prediction</p>
+                    <span class="text-rose-500 font-black text-2xl tracking-tight">${m.pick}</span>
+                </div>
+
+                ${m.liveCode ? `
+                <div class="live-code-badge rounded-2xl p-4 mb-5 flex justify-between items-center cursor-pointer" onclick="copyCode('${m.liveCode}')">
+                    <div class="flex flex-col">
+                        <span class="text-[8px] font-black text-white/70 uppercase tracking-tighter">1XBet Live Code</span>
+                        <span class="text-xl font-black text-white tracking-widest">${m.liveCode}</span>
+                    </div>
+                    <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-copy text-white text-sm"></i>
+                    </div>
                 </div>
                 ` : ''}
 
-                <div class="space-y-3">${(m.items || []).map(it => `<div class="acc-item p-3 rounded-xl flex justify-between items-center"><div class="w-3/4"><p class="text-[11px] font-bold">${it.title}</p><p class="text-[10px] text-sky-500 font-black">${it.pick}</p></div>${it.res ? `<i class="fas ${it.res === 'WIN' ? 'fa-check-circle text-emerald-500' : 'fa-times-circle text-rose-500'} text-xs"></i>` : ''}</div>`).join('')}</div>
+                <div class="flex justify-between items-center bg-white/5 rounded-2xl px-5 py-3">
+                    <span class="text-[9px] text-white/40 font-black uppercase tracking-widest">Staking Amount</span>
+                    <span class="text-xs font-black text-rose-500">${m.betAmount || '50,000 MMK'}</span>
+                </div>
             </div>`;
+        }
+
+        function renderAll() {
+            const list = document.getElementById('tipsContent');
+            const liveList = document.getElementById('liveTipsContent');
+            
+            let filtered = (currentTipType === 'history') ? 
+                matches.filter(m => m.result && m.type !== 'live') : 
+                matches.filter(m => !m.result && (m.type === currentTipType || (!m.type && currentTipType === 'single')));
+            
+            let html = '';
+            let lastDate = '';
+            filtered.forEach(m => {
+                if (m.date !== lastDate) { html += `<div class="flex items-center gap-3 my-8"><div class="flex-1 h-[1px] bg-white/5"></div><span class="text-[10px] font-black text-sky-500 bg-sky-500/10 px-4 py-1 rounded-full border border-sky-500/20">${m.date || 'TODAY'}</span><div class="flex-1 h-[1px] bg-white/5"></div></div>`; lastDate = m.date; }
+                html += (m.type === 'accumulator') ? createAccCard(m) : createSingleCard(m);
+            });
+            list.innerHTML = html || `<div class="text-center py-24 opacity-20 text-[11px] font-black uppercase tracking-widest">No Tips Shared Yet</div>`;
+
+            let liveFiltered = matches.filter(m => m.type === 'live' && !m.result);
+            liveList.innerHTML = liveFiltered.map(m => createLiveCard(m)).join('') || `<div class="text-center py-24 opacity-20 text-[11px] font-black uppercase tracking-widest">Waiting for Live Signal...</div>`;
+            
+            renderAdminList();
         }
 
         function renderAdminList() {
             document.getElementById('adminMatchesList').innerHTML = matches.map(m => `
-                <div class="glass-card rounded-2xl p-4 border border-white/5">
-                    <div class="flex justify-between mb-2"><span class="text-[10px] font-bold text-rose-500 uppercase">${m.type || 'single'}</span><button onclick="window.fb.deleteMatch('${m.id}')"><i class="fas fa-trash text-rose-500"></i></button></div>
-                    <p class="text-xs font-bold text-white mb-3">${m.title || (m.type === 'accumulator' ? 'Accumulator' : 'Match')}</p>
-                    <div class="flex gap-2">
-                        <button onclick="window.fb.updateResult('${m.id}', 'WIN')" class="flex-1 bg-emerald-600/20 text-emerald-500 py-2 rounded-lg text-[10px] font-black">WIN</button>
-                        <button onclick="window.fb.updateResult('${m.id}', 'LOSS')" class="flex-1 bg-rose-600/20 text-rose-500 py-2 rounded-lg text-[10px] font-black">LOSS</button>
+                <div class="glass-card rounded-2xl p-4 border border-white/5 flex flex-col gap-3">
+                    <div class="flex justify-between items-center">
+                        <span class="text-[9px] font-bold text-rose-500 uppercase">${m.type}</span>
+                        <button onclick="window.fb.deleteMatch('${m.id}')" class="text-rose-500/50 hover:text-rose-500"><i class="fas fa-trash-alt"></i></button>
                     </div>
-                </div>`).join('');
+                    <p class="text-xs font-bold text-white">${m.title || 'ACCUMULATOR'}</p>
+                    <div class="flex gap-2 mt-2">
+                        <button onclick="window.fb.updateResult('${m.id}', 'WIN')" class="flex-1 bg-emerald-500/20 text-emerald-500 py-2 rounded-lg text-[9px] font-black uppercase">Win</button>
+                        <button onclick="window.fb.updateResult('${m.id}', 'LOSS')" class="flex-1 bg-rose-500/20 text-rose-500 py-2 rounded-lg text-[9px] font-black uppercase">Loss</button>
+                    </div>
+                </div>
+            `).join('');
         }
 
         function predictMatch() {
@@ -411,7 +459,7 @@
             const res = over_hcps.includes(hcp) ? "ဂိုးပေါ် (OVER)" : "ဂိုးအောက် (UNDER)";
             document.getElementById('resultContainer').classList.remove('hidden');
             document.getElementById('predictionOutput').innerText = res;
-            document.getElementById('matchHeader').innerText = document.getElementById('leagueName').value || 'Prediction';
+            document.getElementById('matchHeader').innerText = document.getElementById('leagueName').value || 'AI PREDICTION';
         }
     </script>
 </body>
