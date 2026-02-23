@@ -21,7 +21,7 @@
             <p class="text-white text-sm font-bold tracking-[0.2em] uppercase">Predictz BOT</p>
             <div class="h-1 w-20 bg-red-600 mx-auto mt-2"></div>
         </div>
-        a
+        
         <div class="space-y-4">
             <!-- Team Names -->
             <div class="grid grid-cols-2 gap-4">
@@ -61,8 +61,8 @@
                 Predict Now
             </button>
 
-            <!-- Telegram Join Button -->
-            <a href="https://t.me/onekick_ofc" target="_blank" class="w-full border-2 border-red-600 text-red-500 font-bold py-3 px-4 rounded-lg hover:bg-red-600 hover:text-white transition duration-200 flex items-center justify-center gap-2">
+            <!-- Telegram Join Button (Changed to Blue) -->
+            <a href="https://t.me/onekick_ofc" target="_blank" class="w-full border-2 border-[#0088cc] text-[#0088cc] font-bold py-3 px-4 rounded-lg hover:bg-[#0088cc] hover:text-white transition duration-200 flex items-center justify-center gap-2">
                 <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .33z"/></svg>
                 Telegram Join ရန်
             </a>
@@ -94,7 +94,6 @@
         const app = initializeApp(firebaseConfig);
         const analytics = getAnalytics(app);
 
-        // Make analytics available globally
         window.logPredictionEvent = (prediction) => {
             logEvent(analytics, 'prediction_made', {
                 prediction_result: prediction
@@ -117,19 +116,16 @@
             const resultContent = document.getElementById('resultContent');
             const resultWarning = document.getElementById('resultWarning');
 
-            // Reset UI
             resultBox.className = "mt-6 hidden p-5 rounded-lg border";
             resultWarning.innerText = "";
             let prediction = null;
             let warningText = "";
 
-            // Formula Helpers
             const isHdpRange1_10to1_30 = (val) => ['1-10', '1-15', '1-20', '1-25', '1-30'].includes(val);
             const isHdpRange1Plus20to40 = (val) => ['1+20', '1+25', '1+30', '1+35', '1+40'].includes(val);
             const list3_3PlusRange = ['3=', '3+5', '3+10', '3+15', '3+20', '3+25', '3+30', '3+35', '3+40'];
             const listHdpF3F4 = ['=', '-10', '-15', '-20', '-25', '-30', '-35', '-40', '-80', '-85', '-90', '-95', '-100', '1+100', '1+95', '1+90', '1+85', '1+80'];
 
-            // Logic matching formulas
             if (isHdpRange1_10to1_30(hdp) && ['2-80', '2-90', '2-100'].includes(total)) {
                 prediction = "ရွေးချယ်မှု : ဂိုးပေါ်";
             } else if (isHdpRange1Plus20to40(hdp) && ['3+20', '3+25', '3+30', '3+35', '3+40'].includes(total)) {
@@ -155,7 +151,6 @@
                 prediction = "ရွေးချယ်မှု : ဂိုးအောက်";
             }
 
-            // UI Feedback
             if (prediction) {
                 resultBox.classList.remove('hidden');
                 resultBox.classList.add('bg-black', 'border-red-600');
