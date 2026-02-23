@@ -2,16 +2,84 @@
 <html lang="my">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ONE KICK Football Prediction Bot</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ONE KICK : Predictz BOT</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    
-    <!-- Firebase SDKs -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Pyidaungsu&display=swap');
+        body {
+            font-family: 'Pyidaungsu', sans-serif;
+            background-color: #1a1a1a; /* Dark background */
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+    <div class="max-w-md mx-auto bg-[#121212] rounded-xl shadow-2xl overflow-hidden md:max-w-2xl p-6 border border-red-900">
+        <!-- Logo/Title Section -->
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-black text-red-600 tracking-tighter">ONE KICK</h1>
+            <p class="text-white text-sm font-bold tracking-[0.2em] uppercase">Predictz BOT</p>
+            <div class="h-1 w-20 bg-red-600 mx-auto mt-2"></div>
+        </div>
+        a
+        <div class="space-y-4">
+            <!-- Team Names -->
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 uppercase mb-1">အိမ်ကွင်းအသင်း</label>
+                    <input type="text" id="homeTeam" placeholder="Home Team" class="mt-1 block w-full bg-black border border-gray-800 text-white rounded-md shadow-sm p-2.5 focus:ring-red-600 focus:border-red-600 outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 uppercase mb-1">အဝေးကွင်းအသင်း</label>
+                    <input type="text" id="awayTeam" placeholder="Away Team" class="mt-1 block w-full bg-black border border-gray-800 text-white rounded-md shadow-sm p-2.5 focus:ring-red-600 focus:border-red-600 outline-none">
+                </div>
+            </div>
+
+            <!-- Favorite Team Select -->
+            <div>
+                <label class="block text-xs font-bold text-gray-400 uppercase mb-1">ကြေးပေးထားသည့်အသင်း</label>
+                <select id="favTeam" class="mt-1 block w-full bg-black border border-gray-800 text-white rounded-md shadow-sm p-2.5 focus:ring-red-600 focus:border-red-600 outline-none">
+                    <option value="">အသင်းရွေးချယ်ပါ</option>
+                    <option value="home">အိမ်ကွင်း</option>
+                    <option value="away">အဝေးကွင်း</option>
+                </select>
+            </div>
+
+            <!-- Inputs -->
+            <div>
+                <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Asian Handicap (ဥပမာ: 1-10, -20)</label>
+                <input type="text" id="hdpInput" placeholder="HDP..." class="mt-1 block w-full bg-black border border-gray-800 text-white rounded-md shadow-sm p-2.5 focus:ring-red-600 focus:border-red-600 outline-none uppercase">
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Asian Total (ဥပမာ: 3+20, 2-80)</label>
+                <input type="text" id="totalInput" placeholder="TOTAL..." class="mt-1 block w-full bg-black border border-gray-800 text-white rounded-md shadow-sm p-2.5 focus:ring-red-600 focus:border-red-600 outline-none uppercase">
+            </div>
+
+            <!-- Predict Button -->
+            <button onclick="predictMatch()" class="w-full bg-red-700 text-white font-black py-4 px-4 rounded-lg hover:bg-red-600 transition duration-200 uppercase tracking-widest shadow-lg shadow-red-900/20">
+                Predict Now
+            </button>
+
+            <!-- Telegram Join Button -->
+            <a href="https://t.me/onekick_ofc" target="_blank" class="w-full border-2 border-red-600 text-red-500 font-bold py-3 px-4 rounded-lg hover:bg-red-600 hover:text-white transition duration-200 flex items-center justify-center gap-2">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .33z"/></svg>
+                Telegram Join ရန်
+            </a>
+
+            <!-- Result Area -->
+            <div id="resultBox" class="mt-6 hidden p-5 rounded-lg border">
+                <h2 id="resultTitle" class="font-bold text-xl mb-2"></h2>
+                <p id="resultContent" class="text-white text-lg font-bold"></p>
+                <p id="resultWarning" class="mt-3 text-red-400 font-medium italic text-sm leading-relaxed"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase Integration -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, deleteDoc, doc, query, onSnapshot, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+        import { getAnalytics, logEvent } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-analytics.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyD5-o9cN6XQoLSB8gzCAyewju5utqLAr10",
@@ -24,442 +92,89 @@
         };
 
         const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+        const analytics = getAnalytics(app);
 
-        signInAnonymously(auth).catch(err => console.error("Auth Error:", err));
-
-        const getFormattedDate = () => {
-            const today = new Date();
-            return today.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-        };
-
-        window.fb = {
-            db,
-            saveMatch: async (data) => {
-                try {
-                    const dateStr = getFormattedDate(); 
-                    await addDoc(collection(db, "daily_tips"), { 
-                        ...data, 
-                        date: dateStr, 
-                        result: "", 
-                        timestamp: Date.now() 
-                    });
-                    return true;
-                } catch (e) { return false; }
-            },
-            updateResult: async (id, resultText) => {
-                try {
-                    await updateDoc(doc(db, "daily_tips", id), { result: resultText });
-                    return true;
-                } catch (e) { return false; }
-            },
-            deleteMatch: async (id) => {
-                try {
-                    await deleteDoc(doc(db, "daily_tips", id));
-                    return true;
-                } catch (e) { return false; }
-            },
-            listenToMatches: (callback) => {
-                return onSnapshot(query(collection(db, "daily_tips")), (snapshot) => {
-                    const data = [];
-                    snapshot.forEach(doc => data.push({ id: doc.id, ...doc.data() }));
-                    data.sort((a, b) => b.timestamp - a.timestamp);
-                    callback(data);
-                }, (error) => console.error("Snapshot Error:", error));
-            }
+        // Make analytics available globally
+        window.logPredictionEvent = (prediction) => {
+            logEvent(analytics, 'prediction_made', {
+                prediction_result: prediction
+            });
         };
     </script>
 
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Pyidaungsu:wght@400;700&display=swap');
-        
-        :root {
-            --neon-pink: #f43f5e;
-            --neon-blue: #3b82f6;
-            --tg-blue: #229ED9;
-        }
-
-        body { 
-            font-family: 'Pyidaungsu', sans-serif; 
-            background: #050505; 
-            color: #ffffff; 
-            -webkit-tap-highlight-color: transparent; 
-            overflow-x: hidden;
-        }
-
-        .neon-text-pink { text-shadow: 0 0 10px rgba(244, 63, 94, 0.8); }
-        
-        .glass-card { 
-            background: rgba(255, 255, 255, 0.02); 
-            backdrop-filter: blur(15px); 
-            border: 1px solid rgba(255, 255, 255, 0.05); 
-        }
-
-        .red-gradient-btn { 
-            background: linear-gradient(135deg, #f43f5e 0%, #9f1239 100%); 
-            box-shadow: 0 0 20px rgba(244, 63, 94, 0.4);
-        }
-
-        .input-field { 
-            background: rgba(255, 255, 255, 0.03); 
-            border: 1px solid rgba(255, 255, 255, 0.08); 
-            transition: 0.3s;
-            color: white;
-        }
-        .input-field:focus { border-color: var(--neon-pink); outline: none; }
-        
-        .tab-btn { color: #555; transition: 0.4s; font-weight: bold; border-bottom: 2px solid transparent; }
-        .tab-btn.active { border-bottom: 2px solid var(--neon-pink); color: var(--neon-pink); }
-        
-        .sub-tab-btn { padding: 8px 16px; border-radius: 30px; font-size: 9px; font-weight: bold; transition: 0.3s; background: rgba(255,255,255,0.03); color: #555; border: 1px solid rgba(255,255,255,0.05); }
-        .sub-tab-btn.active { background: rgba(59, 130, 246, 0.1); color: var(--neon-blue); border-color: rgba(59, 130, 246, 0.4); }
-
-        /* Live Highlight UI */
-        .live-code-badge {
-            background: linear-gradient(135deg, #f43f5e 0%, #be123c 100%);
-            box-shadow: 0 0 20px rgba(244, 63, 94, 0.6);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            animation: glow-pulse 2s infinite ease-in-out;
-        }
-
-        @keyframes glow-pulse {
-            0% { box-shadow: 0 0 5px rgba(244, 63, 94, 0.4); }
-            50% { box-shadow: 0 0 20px rgba(244, 63, 94, 0.8); }
-            100% { box-shadow: 0 0 5px rgba(244, 63, 94, 0.4); }
-        }
-
-        .live-dot { height: 8px; width: 8px; background-color: #f43f5e; border-radius: 50%; display: inline-block; animation: dot-blink 1.5s infinite; }
-        @keyframes dot-blink { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.3; transform: scale(1.2); } 100% { opacity: 1; transform: scale(1); } }
-        
-        /* Accumulator UI */
-        .odds-badge {
-            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-            box-shadow: 0 0 15px rgba(59, 130, 246, 0.6);
-            padding: 8px 16px;
-            border-radius: 50px;
-            font-weight: 900;
-            color: white;
-            font-size: 14px;
-        }
-
-        .acc-item {
-            background: rgba(255, 255, 255, 0.02);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
-            padding: 14px;
-            border-radius: 12px;
-            margin-bottom: 8px;
-        }
-
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-    </style>
-</head>
-<body class="min-h-screen pb-32">
-
-    <!-- Header -->
-    <div class="sticky top-0 z-50 bg-[#050505]/80 backdrop-blur-xl border-b border-white/5 px-4 py-4">
-        <div class="max-w-xl mx-auto flex items-center justify-between">
-            <div class="flex items-center gap-4">
-                <div class="w-10 h-10 bg-rose-600 rounded-xl flex items-center justify-center">
-                    <i class="fas fa-futbol text-white"></i>
-                </div>
-                <div>
-                    <h1 class="text-lg font-black text-white uppercase tracking-tighter neon-text-pink">ONE KICK</h1>
-                </div>
-            </div>
-            <button onclick="toggleAdminView()" class="text-gray-800 px-3"><i class="fas fa-user-shield text-sm"></i></button>
-        </div>
-    </div>
-
-    <!-- Navigation -->
-    <div class="max-w-xl mx-auto flex border-b border-white/5 mb-6 overflow-x-auto no-scrollbar">
-        <button id="tabCalculator" onclick="switchView('calculator')" class="tab-btn flex-1 min-w-[100px] py-4 text-[10px] uppercase tracking-widest active">Calculator</button>
-        <button id="tabMatches" onclick="switchView('matches')" class="tab-btn flex-1 min-w-[100px] py-4 text-[10px] uppercase tracking-widest">Daily Tips</button>
-        <button id="tabLive" onclick="switchView('live')" class="tab-btn flex-1 min-w-[100px] py-4 text-[10px] uppercase tracking-widest flex items-center justify-center gap-2">
-            <span class="live-dot"></span> LIVE
-        </button>
-    </div>
-
-    <div class="max-w-xl mx-auto px-4">
-        
-        <!-- CALCULATOR -->
-        <div id="calculatorView" class="space-y-6">
-            <div class="glass-card rounded-3xl p-6 space-y-4">
-                <input type="text" id="leagueName" placeholder="League Name" class="input-field w-full px-5 py-4 rounded-2xl text-sm">
-                <div class="grid grid-cols-2 gap-3">
-                    <input type="text" id="homeTeam" placeholder="Home Team" class="input-field w-full px-4 py-4 rounded-2xl text-sm">
-                    <input type="text" id="awayTeam" placeholder="Away Team" class="input-field w-full px-4 py-4 rounded-2xl text-sm">
-                </div>
-                <select id="favTeam" class="input-field w-full px-5 py-4 rounded-2xl text-sm bg-black">
-                    <option value="home">Home (ကြေးပေး)</option>
-                    <option value="away">Away (ကြေးပေး)</option>
-                </select>
-                <div class="grid grid-cols-2 gap-3">
-                    <input type="text" id="handicap" placeholder="Handicap" class="input-field w-full px-4 py-4 rounded-2xl text-sm">
-                    <input type="text" id="total" placeholder="OU Total" class="input-field w-full px-4 py-4 rounded-2xl text-sm">
-                </div>
-                <button onclick="predictMatch()" class="red-gradient-btn w-full py-4 rounded-2xl text-white font-black uppercase text-xs tracking-widest">Predict Result</button>
-                
-                <div class="pt-2">
-                    <a href="https://t.me/onekick_ofc" target="_blank" class="flex items-center justify-center gap-3 w-full py-4 rounded-2xl text-white font-black uppercase text-[10px] tracking-widest" style="background: linear-gradient(135deg, #229ED9 0%, #1a83b8 100%);">
-                        <i class="fab fa-telegram text-lg"></i> JOIN TELEGRAM
-                    </a>
-                </div>
-            </div>
-
-            <div id="resultContainer" class="hidden">
-                <div class="glass-card rounded-3xl p-8 text-center border-rose-500/30">
-                    <p id="matchHeader" class="text-[10px] text-rose-400 font-black mb-2 uppercase tracking-widest"></p>
-                    <div id="predictionOutput" class="text-2xl font-black text-white"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- DAILY TIPS -->
-        <div id="matchesView" class="hidden">
-            <div class="flex justify-center gap-2 mb-6">
-                <button id="filterSingle" onclick="setTipType('single')" class="sub-tab-btn active">SINGLE</button>
-                <button id="filterAccumulator" onclick="setTipType('accumulator')" class="sub-tab-btn">ACCUMULATOR</button>
-                <button id="filterHistory" onclick="setTipType('history')" class="sub-tab-btn">HISTORY</button>
-            </div>
-            <div id="tipsContent" class="space-y-6"></div>
-        </div>
-
-        <!-- LIVE -->
-        <div id="liveView" class="hidden">
-            <div id="liveTipsContent" class="space-y-5"></div>
-        </div>
-
-        <!-- ADMIN -->
-        <div id="adminView" class="hidden space-y-6">
-            <div class="glass-card rounded-3xl p-6 space-y-4 border-dashed border-rose-500/30">
-                <h2 class="font-black text-[11px] uppercase tracking-widest text-rose-500">Post New Tip</h2>
-                <select id="adminType" onchange="toggleAdminForm()" class="input-field w-full px-4 py-3 rounded-xl text-xs bg-black">
-                    <option value="single">Single Tip</option>
-                    <option value="accumulator">Accumulator</option>
-                    <option value="live">Live Bet Tip</option>
-                </select>
-
-                <div id="tipInputs" class="space-y-3">
-                    <input type="text" id="adminLeague" placeholder="League" class="input-field w-full px-4 py-3 rounded-xl text-sm">
-                    <input type="text" id="adminTitle" placeholder="Match Title" class="input-field w-full px-4 py-3 rounded-xl text-sm">
-                    <input type="text" id="adminPick" placeholder="Pick" class="input-field w-full px-4 py-3 rounded-xl text-sm">
-                    <input type="text" id="adminLiveCode" placeholder="Live 1XBet Code (Optional)" class="hidden input-field w-full px-4 py-3 rounded-xl text-sm">
-                    <input type="text" id="adminBetAmount" placeholder="Amount (e.g. 50000 MMK)" class="hidden input-field w-full px-4 py-3 rounded-xl text-sm">
-                </div>
-
-                <div id="accForm" class="hidden space-y-4">
-                    <div class="grid grid-cols-2 gap-2">
-                        <input type="text" id="acc1betCode" placeholder="1XBet Code" class="input-field w-full px-4 py-3 rounded-xl text-xs">
-                        <input type="text" id="accOdds" placeholder="Total Odds" class="input-field w-full px-4 py-3 rounded-xl text-xs">
-                    </div>
-                    <div id="accItemsContainer" class="space-y-2">
-                        <input type="text" placeholder="Match 1 - Pick" class="acc-item-val input-field w-full px-3 py-2 rounded-lg text-xs">
-                        <input type="text" placeholder="Match 2 - Pick" class="acc-item-val input-field w-full px-3 py-2 rounded-lg text-xs">
-                        <input type="text" placeholder="Match 3 - Pick" class="acc-item-val input-field w-full px-3 py-2 rounded-lg text-xs">
-                    </div>
-                </div>
-
-                <button onclick="saveAdminMatch()" class="w-full bg-rose-600 py-4 rounded-xl font-black text-xs uppercase tracking-widest">Post Now</button>
-            </div>
-            <div id="adminMatchesList" class="space-y-4"></div>
-        </div>
-    </div>
-
-    <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 bg-rose-600 text-white px-6 py-3 rounded-full text-[10px] font-bold opacity-0 transition-all duration-300 pointer-events-none z-[100] uppercase tracking-widest">Code Copied!</div>
-
     <script>
-        let matches = [];
-        let currentTipType = 'single';
-        const ADMIN_PASS = "admin123";
+        function predictMatch() {
+            const hdp = document.getElementById('hdpInput').value.trim().replace(/\s/g, '');
+            const total = document.getElementById('totalInput').value.trim().replace(/\s/g, '');
+            const home = document.getElementById('homeTeam').value || "အိမ်ကွင်း";
+            const away = document.getElementById('awayTeam').value || "အဝေးကွင်း";
+            const fav = document.getElementById('favTeam').value;
+            
+            const favTeamName = fav === 'home' ? home : (fav === 'away' ? away : "ကြေးပေးအသင်း");
 
-        window.onload = () => { if (window.fb) window.fb.listenToMatches(data => { matches = data; renderAll(); }); };
+            const resultBox = document.getElementById('resultBox');
+            const resultTitle = document.getElementById('resultTitle');
+            const resultContent = document.getElementById('resultContent');
+            const resultWarning = document.getElementById('resultWarning');
 
-        function switchView(view) {
-            document.querySelectorAll('#calculatorView, #matchesView, #liveView, #adminView').forEach(el => el.classList.add('hidden'));
-            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-            if(view === 'calculator') { document.getElementById('calculatorView').classList.remove('hidden'); document.getElementById('tabCalculator').classList.add('active'); }
-            else if(view === 'matches') { document.getElementById('matchesView').classList.remove('hidden'); document.getElementById('tabMatches').classList.add('active'); }
-            else if(view === 'live') { document.getElementById('liveView').classList.remove('hidden'); document.getElementById('tabLive').classList.add('active'); }
-            else if(view === 'admin') document.getElementById('adminView').classList.remove('hidden');
-        }
+            // Reset UI
+            resultBox.className = "mt-6 hidden p-5 rounded-lg border";
+            resultWarning.innerText = "";
+            let prediction = null;
+            let warningText = "";
 
-        function setTipType(type) {
-            currentTipType = type;
-            document.querySelectorAll('.sub-tab-btn').forEach(btn => btn.classList.remove('active'));
-            if(type === 'single') document.getElementById('filterSingle').classList.add('active');
-            else if(type === 'accumulator') document.getElementById('filterAccumulator').classList.add('active');
-            else if(type === 'history') document.getElementById('filterHistory').classList.add('active');
-            renderAll();
-        }
+            // Formula Helpers
+            const isHdpRange1_10to1_30 = (val) => ['1-10', '1-15', '1-20', '1-25', '1-30'].includes(val);
+            const isHdpRange1Plus20to40 = (val) => ['1+20', '1+25', '1+30', '1+35', '1+40'].includes(val);
+            const list3_3PlusRange = ['3=', '3+5', '3+10', '3+15', '3+20', '3+25', '3+30', '3+35', '3+40'];
+            const listHdpF3F4 = ['=', '-10', '-15', '-20', '-25', '-30', '-35', '-40', '-80', '-85', '-90', '-95', '-100', '1+100', '1+95', '1+90', '1+85', '1+80'];
 
-        function toggleAdminForm() {
-            const type = document.getElementById('adminType').value;
-            document.getElementById('tipInputs').classList.toggle('hidden', type === 'accumulator');
-            document.getElementById('accForm').classList.toggle('hidden', type !== 'accumulator');
-            document.getElementById('adminBetAmount').classList.toggle('hidden', type !== 'live');
-            document.getElementById('adminLiveCode').classList.toggle('hidden', type !== 'live');
-        }
+            // Logic matching formulas
+            if (isHdpRange1_10to1_30(hdp) && ['2-80', '2-90', '2-100'].includes(total)) {
+                prediction = "ရွေးချယ်မှု : ဂိုးပေါ်";
+            } else if (isHdpRange1Plus20to40(hdp) && ['3+20', '3+25', '3+30', '3+35', '3+40'].includes(total)) {
+                prediction = `ရွေးချယ်မှု : ${favTeamName} , ဂိုးပေါ်`;
+            } else if (listHdpF3F4.includes(hdp) && list3_3PlusRange.includes(total)) {
+                prediction = "ရွေးချယ်မှု : ဂိုးပေါ်";
+            } else if (listHdpF3F4.includes(hdp) && ['3-10', '3-15', '3-20', '3-25', '3-30'].includes(total)) {
+                prediction = "ရွေးချယ်မှု : ဂိုးပေါ်";
+                warningText = "2 သင်းပေါင်းအနည်းဆုံး 3 လုံးရောက်နိုင်ပေမယ့် 4 လုံးရောက်ဖို့ အနည်းငယ်လေး ခက်ပါလိမ့်မယ်။ Total Over 2.5 က ဒီပွဲ ပို Safe ဖြစ်ပါတယ်။";
+            } else if (['1-20', '1-30', '1-40'].includes(hdp) && ['3+20', '3+30', '3+40'].includes(total)) {
+                prediction = "ရွေးချယ်မှု : ဂိုးပေါ်";
+            } else if (['1-80', '1-85', '1-90', '1-95', '1-100'].includes(hdp) && ['3-80', '3-85', '3-90', '3-95', '3-100'].includes(total)) {
+                prediction = `ရွေးချယ်မှု : ${favTeamName} , ဂိုးပေါ်`;
+            } else if (['-20', '-25', '-30'].includes(hdp) && ['2-80', '2-85', '2-90', '2-95', '2-100', '3+80', '3+85', '3+90', '3+95', '3+100'].includes(total)) {
+                prediction = "ရွေးချယ်မှု : ဂိုးပေါ်";
+            } else if (['=', '-5', '-10', '-15', '20', '-25', '-30', '-35', '-40'].includes(hdp) && ['2=', '2-5', '2-10', '2-15', '2-20', '2-25', '2-30', '2-35', '2-40'].includes(total)) {
+                prediction = "ရွေးချယ်မှု : ဂိုးအောက်";
+            } else if (['1+50', '1+55', '1+65', '1+75', '1+85', '1+60', '1+70', '1+80', '1+90'].includes(hdp) && ['2-60', '2-65', '2-70', '2-75', '2-80'].includes(total)) {
+                prediction = "ရွေးချယ်မှု : ဂိုးအောက်";
+            } else if (['1-70', '1-75', '1-80', '1-85', '1-90', '1-95', '1-100'].includes(hdp) && list3_3PlusRange.includes(total)) {
+                prediction = "ရွေးချယ်မှု : ဂိုးပေါ်";
+            } else if (['-40', '-45', '-50', '-55', '-60'].includes(hdp) && ['3-40', '3-45', '3-50', '3-55', '3-60'].includes(total)) {
+                prediction = "ရွေးချယ်မှု : ဂိုးအောက်";
+            }
 
-        function toggleAdminView() { if(prompt("Admin Password:") === ADMIN_PASS) switchView('admin'); }
+            // UI Feedback
+            if (prediction) {
+                resultBox.classList.remove('hidden');
+                resultBox.classList.add('bg-black', 'border-red-600');
+                resultTitle.innerText = "Match Analysis Found!";
+                resultTitle.className = "font-black text-xl mb-2 text-red-500 uppercase";
+                resultContent.innerText = prediction;
+                resultWarning.innerText = warningText;
 
-        async function saveAdminMatch() {
-            const type = document.getElementById('adminType').value;
-            let data = { type, time: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) };
-            if(type !== 'accumulator') {
-                data.league = document.getElementById('adminLeague').value;
-                data.title = document.getElementById('adminTitle').value;
-                data.pick = document.getElementById('adminPick').value;
-                if(type === 'live') {
-                    data.betAmount = document.getElementById('adminBetAmount').value;
-                    data.liveCode = document.getElementById('adminLiveCode').value;
+                if (window.logPredictionEvent) {
+                    window.logPredictionEvent(prediction);
                 }
             } else {
-                data.betCode = document.getElementById('acc1betCode').value;
-                data.odds = document.getElementById('accOdds').value;
-                data.items = [];
-                document.querySelectorAll('.acc-item-val').forEach(input => {
-                    if(input.value) data.items.push({ title: input.value.split('-')[0], pick: input.value.split('-')[1] || '' });
-                });
+                resultBox.classList.remove('hidden');
+                resultBox.classList.add('bg-black', 'border-gray-800');
+                resultTitle.innerText = "No Prediction";
+                resultTitle.className = "font-bold text-lg mb-2 text-gray-500 uppercase";
+                resultContent.innerText = "Formula မဝင်ပါ။ ရွေးချယ်မှု မရှိပါ။";
+                resultWarning.innerText = "";
             }
-            await window.fb.saveMatch(data);
-            alert("Success!");
-            renderAll();
-        }
-
-        function copyCode(code) {
-            if(!code) return;
-            const el = document.createElement('textarea');
-            el.value = code;
-            document.body.appendChild(el);
-            el.select();
-            document.execCommand('copy');
-            document.body.removeChild(el);
-            const t = document.getElementById('toast');
-            t.style.opacity = '1';
-            setTimeout(() => t.style.opacity = '0', 2000);
-        }
-
-        function createSingleCard(m) {
-            const resClass = m.result === 'WIN' ? 'border-emerald-500/40 bg-emerald-500/5' : m.result === 'LOSS' ? 'border-rose-500/40 bg-rose-500/5' : 'border-sky-500/10';
-            return `<div class="glass-card rounded-3xl p-6 border ${resClass}">
-                <div class="flex justify-between items-start mb-4">
-                    <span class="text-[9px] font-black uppercase text-sky-500 tracking-widest">${m.league || 'SINGLE'}</span>
-                    ${m.result ? `<span class="px-3 py-1 rounded-lg font-black text-[9px] ${m.result === 'WIN' ? 'bg-emerald-500' : 'bg-rose-500'}">${m.result}</span>` : ''}
-                </div>
-                <h3 class="font-bold mb-4 text-white">${m.title}</h3>
-                <div class="bg-black/40 rounded-2xl p-4 text-center border border-white/5"><span class="text-sky-400 font-black">${m.pick}</span></div>
-            </div>`;
-        }
-
-        function createAccCard(m) {
-            return `<div class="glass-card rounded-[2.5rem] p-6 mb-6" style="background: linear-gradient(180deg, #050505 0%, rgba(10,20,40,0.5) 100%); border-color: rgba(59,130,246,0.2);">
-                <div class="flex justify-between items-center mb-6">
-                    <span class="text-[10px] font-black uppercase text-sky-400 tracking-widest">ACCUMULATOR</span>
-                    <div class="odds-badge">@Odds : ${m.odds || '0.00'}</div>
-                </div>
-
-                <div class="bg-white/5 border border-dashed border-sky-500/30 rounded-2xl p-4 mb-6 cursor-pointer" onclick="copyCode('${m.betCode}')">
-                    <p class="text-[8px] font-black text-sky-500 uppercase mb-1 tracking-wider">1XBet Booking Code</p>
-                    <div class="flex justify-between items-center">
-                        <span class="text-lg font-black text-white tracking-widest uppercase">${m.betCode || 'N/A'}</span>
-                        <i class="far fa-copy text-sky-500 text-sm"></i>
-                    </div>
-                </div>
-
-                <div class="space-y-2">
-                    ${(m.items || []).map(it => `
-                        <div class="acc-item">
-                            <p class="text-[12px] font-bold text-white">${it.title}</p>
-                            <p class="text-[11px] font-black text-sky-400">${it.pick}</p>
-                        </div>
-                    `).join('')}
-                </div>
-            </div>`;
-        }
-
-        function createLiveCard(m) {
-            return `<div class="glass-card rounded-[2.5rem] p-6 border-2 border-rose-500/30 bg-gradient-to-br from-rose-900/10 via-black to-black">
-                <div class="flex justify-between items-center mb-5">
-                    <div class="flex items-center gap-2">
-                        <span class="live-dot"></span>
-                        <span class="text-[10px] font-black uppercase text-rose-500 tracking-widest">LIVE BETTING</span>
-                    </div>
-                    <span class="text-[9px] text-white/40 font-bold">${m.time}</span>
-                </div>
-                
-                <h3 class="font-black mb-1 text-white text-xl leading-tight">${m.title}</h3>
-                <p class="text-[10px] text-white/40 font-bold mb-5 uppercase tracking-wide">${m.league}</p>
-
-                <div class="bg-rose-600/10 rounded-3xl p-6 text-center border border-rose-500/20 mb-5">
-                    <p class="text-[9px] text-rose-400 font-black uppercase mb-2 tracking-widest">Our Prediction</p>
-                    <span class="text-rose-500 font-black text-2xl tracking-tight">${m.pick}</span>
-                </div>
-
-                ${m.liveCode ? `
-                <div class="live-code-badge rounded-2xl p-4 mb-5 flex justify-between items-center cursor-pointer" onclick="copyCode('${m.liveCode}')">
-                    <div class="flex flex-col">
-                        <span class="text-[8px] font-black text-white/70 uppercase tracking-tighter">1XBet Live Code</span>
-                        <span class="text-xl font-black text-white tracking-widest">${m.liveCode}</span>
-                    </div>
-                    <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
-                        <i class="fas fa-copy text-white text-sm"></i>
-                    </div>
-                </div>
-                ` : ''}
-
-                <div class="flex justify-between items-center bg-white/5 rounded-2xl px-5 py-3">
-                    <span class="text-[9px] text-white/40 font-black uppercase tracking-widest">Staking Amount</span>
-                    <span class="text-xs font-black text-rose-500">${m.betAmount || '50,000 MMK'}</span>
-                </div>
-            </div>`;
-        }
-
-        function renderAll() {
-            const list = document.getElementById('tipsContent');
-            const liveList = document.getElementById('liveTipsContent');
-            
-            let filtered = (currentTipType === 'history') ? 
-                matches.filter(m => m.result && m.type !== 'live') : 
-                matches.filter(m => !m.result && (m.type === currentTipType || (!m.type && currentTipType === 'single')));
-            
-            let html = '';
-            let lastDate = '';
-            filtered.forEach(m => {
-                if (m.date !== lastDate) { html += `<div class="flex items-center gap-3 my-8"><div class="flex-1 h-[1px] bg-white/5"></div><span class="text-[10px] font-black text-sky-500 bg-sky-500/10 px-4 py-1 rounded-full border border-sky-500/20">${m.date || 'TODAY'}</span><div class="flex-1 h-[1px] bg-white/5"></div></div>`; lastDate = m.date; }
-                html += (m.type === 'accumulator') ? createAccCard(m) : createSingleCard(m);
-            });
-            list.innerHTML = html || `<div class="text-center py-24 opacity-20 text-[11px] font-black uppercase tracking-widest">No Tips Shared Yet</div>`;
-
-            let liveFiltered = matches.filter(m => m.type === 'live' && !m.result);
-            liveList.innerHTML = liveFiltered.map(m => createLiveCard(m)).join('') || `<div class="text-center py-24 opacity-20 text-[11px] font-black uppercase tracking-widest">Waiting for Live Signal...</div>`;
-            
-            renderAdminList();
-        }
-
-        function renderAdminList() {
-            document.getElementById('adminMatchesList').innerHTML = matches.map(m => `
-                <div class="glass-card rounded-2xl p-4 border border-white/5 flex flex-col gap-3">
-                    <div class="flex justify-between items-center">
-                        <span class="text-[9px] font-bold text-rose-500 uppercase">${m.type}</span>
-                        <button onclick="window.fb.deleteMatch('${m.id}')" class="text-rose-500/50 hover:text-rose-500"><i class="fas fa-trash-alt"></i></button>
-                    </div>
-                    <p class="text-xs font-bold text-white">${m.title || 'ACCUMULATOR'}</p>
-                    <div class="flex gap-2 mt-2">
-                        <button onclick="window.fb.updateResult('${m.id}', 'WIN')" class="flex-1 bg-emerald-500/20 text-emerald-500 py-2 rounded-lg text-[9px] font-black uppercase">Win</button>
-                        <button onclick="window.fb.updateResult('${m.id}', 'LOSS')" class="flex-1 bg-rose-500/20 text-rose-500 py-2 rounded-lg text-[9px] font-black uppercase">Loss</button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function predictMatch() {
-            const hcp = document.getElementById('handicap').value.trim();
-            const over_hcps = ["1-10", "1-15", "1-20", "1-25", "1-30", "1+20", "1+25", "1+30", "1+35", "1+40", "-20", "-25", "-30", "1-70", "1-80"];
-            const res = over_hcps.includes(hcp) ? "ဂိုးပေါ် (OVER)" : "ဂိုးအောက် (UNDER)";
-            document.getElementById('resultContainer').classList.remove('hidden');
-            document.getElementById('predictionOutput').innerText = res;
-            document.getElementById('matchHeader').innerText = document.getElementById('leagueName').value || 'AI PREDICTION';
         }
     </script>
 </body>
