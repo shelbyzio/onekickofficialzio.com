@@ -217,7 +217,7 @@
             </div>
 
             <div id="tipsContainer" class="space-y-6">
-                <div class="text-center py-10 text-gray-700 text-xs uppercase tracking-widest animate-pulse">Loading Tips...</div>
+                <div id="loader" class="text-center py-10 text-gray-700 text-xs uppercase tracking-widest animate-pulse">Syncing with Server...</div>
             </div>
 
             <div class="mt-10 text-center">
@@ -226,7 +226,7 @@
         </div>
 
         <footer class="mt-12 text-center">
-            <p class="text-[10px] text-gray-600 font-bold uppercase tracking-[0.3em]">One Kick Official Bot v2.6.0</p>
+            <p class="text-[10px] text-gray-600 font-bold uppercase tracking-[0.3em]">One Kick Official Bot v2.7.0</p>
         </footer>
     </div>
 
@@ -264,10 +264,12 @@
     </datalist>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, updateDoc, serverTimestamp, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        // Firebase 12.10.0 Imports
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, updateDoc, serverTimestamp, disableNetwork, enableNetwork } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
 
+        // Provided Config
         const firebaseConfig = {
             apiKey: "AIzaSyBcetLiZbDLV3DilnQxqCpYQy0L22P-2GA",
             authDomain: "one-kick-official-2.firebaseapp.com",
@@ -277,118 +279,136 @@
             appId: "1:852449306479:web:98710d8143488d1014ea9a",
             measurementId: "G-XJ0GSN4W2G"
         };
+        const appId = "one-kick-official-2";
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
-        const appId = "one-kick-official-2";
+        
+        // Path Rule 1
         const tipsCollection = collection(db, 'artifacts', appId, 'public', 'data', 'daily_tips');
 
-        let user = null;
-        let isAdmin = localStorage.getItem('onekick_admin') === 'true'; // Remember login state
+        let isAdmin = localStorage.getItem('onekick_admin') === 'true'; 
         let activeTipView = 'current'; 
         let selectedMatchId = null;
+        let unsubscribeTips = null;
 
-        // Sync Admin Panel UI
-        if(isAdmin) {
-            document.addEventListener('DOMContentLoaded', () => {
-                document.getElementById('adminPanel').classList.remove('hidden');
-                document.getElementById('adminLoginBtn').classList.add('hidden');
+        async function startApp() {
+            updateAdminUI();
+            
+            // Rule 3: Auth first
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    console.log("Logged in:", user.uid);
+                    setupTipsListener();
+                } else {
+                    signInAnonymously(auth).catch(e => console.error("Auth Fail", e));
+                }
             });
         }
 
-        async function initAuth() {
-            try {
-                await signInAnonymously(auth);
-                onAuthStateChanged(auth, (u) => {
-                    user = u;
-                    if(user) loadTips();
-                });
-            } catch (err) { console.error("Firebase Auth Error", err); }
+        function updateAdminUI() {
+            const panel = document.getElementById('adminPanel');
+            const loginBtn = document.getElementById('adminLoginBtn');
+            if (isAdmin) {
+                panel?.classList.remove('hidden');
+                loginBtn?.classList.add('hidden');
+            } else {
+                panel?.classList.add('hidden');
+                loginBtn?.classList.remove('hidden');
+            }
         }
-        initAuth();
 
-        function loadTips() {
-            if (!user) return;
-            
-            // fetch all data and filter in JS memory as per Rule 2
-            onSnapshot(tipsCollection, (snapshot) => {
+        function setupTipsListener() {
+            if (unsubscribeTips) unsubscribeTips();
+
+            const loader = document.getElementById('loader');
+            if (loader) {
+                loader.classList.remove('hidden');
+                loader.innerText = "Connecting to Live Server...";
+            }
+
+            // Simple Collection Query (Rule 2)
+            unsubscribeTips = onSnapshot(tipsCollection, { includeMetadataChanges: false }, (snapshot) => {
                 const container = document.getElementById('tipsContainer');
-                if(!container) return;
-                
-                container.innerHTML = '';
-                let tips = [];
-                snapshot.forEach(doc => tips.push({ id: doc.id, ...doc.data() }));
+                if (!container) return;
+                if (loader) loader.classList.add('hidden');
 
-                // Filtering logic
-                if (activeTipView === 'current') {
-                    tips = tips.filter(t => t.result === 'pending' || !t.result);
-                } else {
-                    tips = tips.filter(t => t.result && t.result !== 'pending');
-                }
-                
-                // Sorting logic
-                tips.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
-
-                if (tips.length === 0) {
-                    container.innerHTML = `<div class="text-center py-20 text-gray-700 text-xs uppercase tracking-widest">No ${activeTipView} matches found.</div>`;
-                    return;
-                }
-
-                tips.forEach(tip => {
-                    const statusClass = tip.result ? `status-${tip.result}` : 'status-pending';
-                    const themeClass = tip.result === 'win' ? 'card-win' : (tip.result === 'loss' ? 'card-loss' : '');
-                    const statusText = tip.result || 'pending';
-                    
-                    const card = document.createElement('div');
-                    card.className = `tip-card ${themeClass} shadow-2xl animate-in fade-in duration-500 mb-6`;
-                    card.innerHTML = `
-                        <div class="league-tag">${tip.league || 'FOOTBALL LEAGUE'}</div>
-                        <div class="match-title">${tip.match}</div>
-                        <div class="choice-box">
-                            <span class="choice-text-label">Choice : </span>
-                            <span class="choice-text-value">${tip.pick}</span>
-                        </div>
-                        <div class="status-badge ${statusClass}">${statusText}</div>
-                        
-                        ${isAdmin ? `
-                        <div class="absolute top-4 right-4 flex space-x-2">
-                            <button onclick="window.openResultModal('${tip.id}')" class="bg-blue-600/20 text-blue-400 p-2 rounded-lg font-bold text-[8px] uppercase tracking-tighter">Result</button>
-                            <button onclick="window.deleteTip('${tip.id}')" class="bg-red-600/20 text-red-500 p-2 rounded-lg font-bold text-[8px] uppercase tracking-tighter">Del</button>
-                        </div>` : ''}
-                    `;
-                    container.appendChild(card);
+                let allTips = [];
+                snapshot.forEach(doc => {
+                    allTips.push({ id: doc.id, ...doc.data() });
                 });
+
+                // Filter & Sort in JS (Rule 2)
+                let filteredTips = allTips.filter(t => {
+                    const isPending = !t.result || t.result === 'pending';
+                    return activeTipView === 'current' ? isPending : !isPending;
+                });
+
+                filteredTips.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+
+                renderTips(filteredTips);
+
             }, (error) => {
-                console.error("Firestore Listen Error:", error);
+                console.error("Live Sync Error:", error.message);
+                if (loader) loader.innerHTML = `<span class="text-red-500">Online Access Error.</span>`;
+            });
+        }
+
+        function renderTips(tips) {
+            const container = document.getElementById('tipsContainer');
+            if (!container) return;
+            container.innerHTML = '';
+
+            if (tips.length === 0) {
+                container.innerHTML = `<div class="text-center py-20 text-gray-800 text-[10px] uppercase font-bold tracking-widest border border-red-900/20 rounded-3xl">No ${activeTipView} tips found.</div>`;
+                return;
+            }
+
+            tips.forEach(tip => {
+                const statusClass = tip.result ? `status-${tip.result}` : 'status-pending';
+                const themeClass = tip.result === 'win' ? 'card-win' : (tip.result === 'loss' ? 'card-loss' : '');
+                
+                const card = document.createElement('div');
+                card.className = `tip-card ${themeClass} shadow-2xl mb-6`;
+                card.innerHTML = `
+                    <div class="league-tag">${tip.league || 'FOOTBALL'}</div>
+                    <div class="match-title">${tip.match}</div>
+                    <div class="choice-box">
+                        <span class="choice-text-label">Choice : </span>
+                        <span class="choice-text-value">${tip.pick}</span>
+                    </div>
+                    <div class="status-badge ${statusClass}">${tip.result || 'pending'}</div>
+                    
+                    ${isAdmin ? `
+                    <div class="absolute top-4 right-4 flex space-x-2">
+                        <button onclick="window.openResultModal('${tip.id}')" class="bg-blue-600/30 text-blue-400 p-2 px-3 rounded-lg font-bold text-[8px]">EDIT</button>
+                        <button onclick="window.deleteTip('${tip.id}')" class="bg-red-600/30 text-red-500 p-2 px-3 rounded-lg font-bold text-[8px]">DEL</button>
+                    </div>` : ''}
+                `;
+                container.appendChild(card);
             });
         }
 
         window.handleLogin = () => {
-            const pass = document.getElementById('adminPassword').value;
-            if (pass === "admin123") {
+            if (document.getElementById('adminPassword').value === "admin123") {
                 isAdmin = true;
-                localStorage.setItem('onekick_admin', 'true'); // Persist login
-                document.getElementById('adminPanel').classList.remove('hidden');
-                document.getElementById('adminLoginBtn').classList.add('hidden');
+                localStorage.setItem('onekick_admin', 'true');
+                updateAdminUI();
                 window.hideLoginModal();
-                loadTips();
-            } else {
-                alert("Incorrect Password!");
-                document.getElementById('adminPassword').value = '';
-            }
+                setupTipsListener();
+            } else { alert("Access Denied"); }
         };
 
         window.logoutAdmin = () => {
             isAdmin = false;
-            localStorage.removeItem('onekick_admin'); // Clear persisted login
-            document.getElementById('adminPanel').classList.add('hidden');
-            document.getElementById('adminLoginBtn').classList.remove('hidden');
-            loadTips(); // Refresh view to hide admin buttons
+            localStorage.setItem('onekick_admin', 'false');
+            updateAdminUI();
+            setupTipsListener();
         };
 
         window.addTip = async () => {
-            if (!isAdmin || !user) return;
+            if (!isAdmin || !auth.currentUser) return;
             const league = document.getElementById('tipLeague').value.trim();
             const match = document.getElementById('tipMatch').value.trim();
             const pick = document.getElementById('tipPick').value.trim();
@@ -396,69 +416,67 @@
 
             try {
                 await addDoc(tipsCollection, { 
-                    league: league || "GENERAL", 
-                    match, 
-                    pick, 
-                    result: 'pending',
+                    league: league.toUpperCase() || "FOOTBALL", 
+                    match, pick, result: 'pending',
                     createdAt: serverTimestamp() 
                 });
                 document.getElementById('tipLeague').value = '';
                 document.getElementById('tipMatch').value = '';
                 document.getElementById('tipPick').value = '';
-            } catch (e) { console.error("Firestore Write Error", e); }
+            } catch (e) { console.error("Add Fail", e); }
         };
 
         window.updateMatchResult = async (status) => {
-            if (!selectedMatchId || !isAdmin || !user) return;
+            if (!selectedMatchId || !isAdmin) return;
             try {
                 const matchDoc = doc(db, 'artifacts', appId, 'public', 'data', 'daily_tips', selectedMatchId);
                 await updateDoc(matchDoc, { result: status });
                 window.closeResultModal();
-            } catch (e) { console.error("Update Error", e); }
+            } catch (e) { console.error("Update Fail", e); }
         };
 
         window.deleteTip = async (id) => {
-            if (!isAdmin || !user) return;
-            if(confirm("Confirm Delete Match?")) {
-                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'daily_tips', id));
+            if (isAdmin && confirm("Confirm Delete?")) {
+                try { await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'daily_tips', id)); }
+                catch (e) { console.error("Del Fail", e); }
             }
         };
 
-        // Utility functions
         window.switchTipView = (view) => {
             activeTipView = view;
             const tabCurrent = document.getElementById('tabCurrent');
             const tabHistory = document.getElementById('tabHistory');
-            if (view === 'current') {
-                tabCurrent.className = 'flex-1 py-3 text-[10px] uppercase font-black tracking-widest rounded-xl bg-red-600 text-white transition-all';
-                tabHistory.className = 'flex-1 py-3 text-[10px] uppercase font-black tracking-widest rounded-xl text-gray-500 transition-all';
-            } else {
-                tabHistory.className = 'flex-1 py-3 text-[10px] uppercase font-black tracking-widest rounded-xl bg-red-600 text-white transition-all';
-                tabCurrent.className = 'flex-1 py-3 text-[10px] uppercase font-black tracking-widest rounded-xl text-gray-500 transition-all';
-            }
-            loadTips();
+            const activeStyle = 'flex-1 py-3 text-[10px] uppercase font-black tracking-widest rounded-xl bg-red-600 text-white transition-all';
+            const inactiveStyle = 'flex-1 py-3 text-[10px] uppercase font-black tracking-widest rounded-xl text-gray-500 transition-all';
+            if (tabCurrent) tabCurrent.className = (view === 'current') ? activeStyle : inactiveStyle;
+            if (tabHistory) tabHistory.className = (view === 'history') ? activeStyle : inactiveStyle;
+            setupTipsListener();
         };
 
         window.openResultModal = (id) => { selectedMatchId = id; document.getElementById('resultModal').classList.remove('hidden'); };
         window.closeResultModal = () => { selectedMatchId = null; document.getElementById('resultModal').classList.add('hidden'); };
         window.showLoginModal = () => document.getElementById('loginModal').classList.remove('hidden');
         window.hideLoginModal = () => document.getElementById('loginModal').classList.add('hidden');
+        
         window.switchPage = (page) => {
             document.getElementById('botPage').classList.toggle('hidden', page !== 'bot');
             document.getElementById('tipsPage').classList.toggle('hidden', page !== 'tips');
             document.getElementById('navBot').classList.toggle('active', page === 'bot');
             document.getElementById('navTips').classList.toggle('active', page === 'tips');
+            if (page === 'tips') setupTipsListener();
         };
 
         window.calculatePrediction = () => {
             const hdp = document.getElementById('hdpInput').value.trim();
             const total = document.getElementById('totalInput').value.trim();
-            let selection = (hdp === "-10" && total === "3+20") ? "ဂိုးပေါ် (Over)" : "ကိုက်ညီသည့် Formula မရှိပါ။";
-            if (hdp === "-20" && total === "2-80") selection = "ဂိုးပေါ် (Over)";
-            const resultArea = document.getElementById('resultArea');
-            resultArea.classList.remove('hidden');
+            let selection = "Formula Error: Data not found.";
+            if (hdp === "-10" && total === "3+20") selection = "Over (ဂိုးပေါ်)";
+            if (hdp === "-20" && total === "2-80") selection = "Over (ဂိုးပေါ်)";
+            document.getElementById('resultArea').classList.remove('hidden');
             document.getElementById('selectionText').innerHTML = `Selection: <span class="text-red-500">${selection}</span>`;
         };
+
+        window.onload = startApp;
     </script>
 </body>
 </html>
