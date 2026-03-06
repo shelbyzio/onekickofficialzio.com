@@ -1,176 +1,464 @@
 <!DOCTYPE html>
-<html lang="my">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ONE KICK : Predictz BOT</title>
+    <title>ONE KICK : Formula Bot & Daily Tips</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Pyidaungsu&display=swap');
         body {
-            font-family: 'Pyidaungsu', sans-serif;
-            background-color: #1a1a1a; /* Dark background */
+            background: radial-gradient(circle at top right, #1a0000, #000000);
+            min-height: 100vh;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+        
+        .modern-card {
+            background: rgba(18, 18, 18, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 0, 0, 0.2);
+            border-radius: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .input-field {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .input-field:focus {
+            background: rgba(255, 255, 255, 0.07);
+            border-color: #ff0000;
+            outline: none;
+        }
+
+        .btn-predict {
+            background: linear-gradient(135deg, #ff0000 0%, #990000 100%);
+            box-shadow: 0 10px 25px -5px rgba(255, 0, 0, 0.4);
+        }
+
+        .btn-telegram {
+            background: linear-gradient(135deg, #24A1DE 0%, #1c88bc 100%);
+            box-shadow: 0 10px 20px -5px rgba(36, 161, 222, 0.4);
+        }
+
+        .nav-btn {
+            transition: all 0.3s ease;
+            border-bottom: 2px solid transparent;
+            opacity: 0.6;
+            font-weight: 800;
+        }
+
+        .nav-btn.active {
+            color: #ff0000;
+            border-bottom: 2px solid #ff0000;
+            opacity: 1;
+        }
+
+        .tip-card {
+            background: #0a0a0a;
+            border: 1px solid rgba(255, 0, 0, 0.2);
+            border-radius: 2rem;
+            padding: 2.5rem 1.5rem;
+            text-align: center;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .card-win {
+            border: 1px solid rgba(52, 211, 153, 0.5);
+            background: linear-gradient(180deg, #0a0a0a 0%, rgba(6, 95, 70, 0.2) 100%);
+            box-shadow: 0 10px 40px -10px rgba(6, 95, 70, 0.4);
+        }
+        .card-win .league-tag { color: #34d399; }
+        .card-win .choice-text-label { color: #34d399; }
+
+        .card-loss {
+            border: 1px solid rgba(248, 113, 113, 0.4);
+            background: linear-gradient(180deg, #0a0a0a 0%, rgba(127, 29, 29, 0.2) 100%);
+            box-shadow: 0 10px 40px -10px rgba(127, 29, 29, 0.3);
+        }
+        .card-loss .league-tag { color: #f87171; }
+        .card-loss .choice-text-label { color: #f87171; }
+
+        .league-tag {
+            color: #ff0000;
+            font-size: 0.7rem;
+            font-weight: 800;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            margin-bottom: 1.5rem;
+        }
+
+        .match-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 2rem;
+            line-height: 1.4;
+        }
+
+        .choice-box {
+            background: rgba(0,0,0,0.5);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 1.5rem;
+            padding: 1.25rem;
+            margin-top: 1rem;
+        }
+
+        .choice-text-label {
+            color: #ff0000;
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .choice-text-value {
+            color: #ffffff;
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .status-badge {
+            font-size: 0.65rem;
+            padding: 4px 12px;
+            border-radius: 99px;
+            text-transform: uppercase;
+            font-weight: 900;
+            margin-top: 15px;
+            display: inline-block;
+        }
+
+        .status-win { background: #065f46; color: #34d399; }
+        .status-loss { background: #7f1d1d; color: #f87171; }
+        .status-draw { background: #374151; color: #d1d5db; }
+        .status-pending { background: #1e1b4b; color: #818cf8; }
+
+        .modal-overlay {
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
         }
     </style>
 </head>
-<body class="p-4 md:p-8">
-    <div class="max-w-md mx-auto bg-[#121212] rounded-xl shadow-2xl overflow-hidden md:max-w-2xl p-6 border border-red-900">
-        <!-- Logo/Title Section -->
-        <div class="text-center mb-8">
-            <h1 class="text-3xl font-black text-red-600 tracking-tighter">ONE KICK</h1>
-            <p class="text-white text-sm font-bold tracking-[0.2em] uppercase">Predictz BOT</p>
-            <div class="h-1 w-20 bg-red-600 mx-auto mt-2"></div>
+<body class="p-4 sm:p-6">
+
+    <div class="max-w-lg mx-auto w-full pt-6">
+        <!-- Navigation -->
+        <nav class="flex justify-center space-x-10 mb-8">
+            <button id="navBot" onclick="switchPage('bot')" class="nav-btn active text-xs uppercase tracking-widest">Formula Bot</button>
+            <button id="navTips" onclick="switchPage('tips')" class="nav-btn text-xs uppercase tracking-widest">Daily Tips</button>
+        </nav>
+
+        <!-- Prediction Bot Page -->
+        <div id="botPage" class="modern-card p-8 sm:p-10 shadow-2xl">
+            <header class="text-center mb-10">
+                <div class="inline-block p-1 px-3 rounded-full bg-red-600/10 border border-red-600/20 text-red-500 text-[10px] uppercase tracking-[0.2em] font-bold mb-3">
+                    Professional Prediction Engine
+                </div>
+                <h1 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tighter mb-2">
+                    ONE KICK <span class="text-red-600">.</span>
+                </h1>
+                <p class="text-gray-400 text-sm font-medium">Formula-Based Betting Analysis</p>
+            </header>
+
+            <div class="space-y-6">
+                <div class="grid grid-cols-2 gap-4">
+                    <input type="text" id="homeTeam" placeholder="Home Team" class="input-field w-full p-4 rounded-2xl">
+                    <input type="text" id="awayTeam" placeholder="Away Team" class="input-field w-full p-4 rounded-2xl">
+                </div>
+
+                <div class="input-group">
+                    <select id="favTeamSelect" class="input-field w-full p-4 rounded-2xl appearance-none cursor-pointer">
+                        <option value="home">Home Team (အပေါ်သင်း)</option>
+                        <option value="away">Away Team (အောက်သင်း)</option>
+                    </select>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <input type="text" id="hdpInput" list="hdpOptions" placeholder="Handicap" class="input-field w-full p-4 rounded-2xl uppercase font-semibold">
+                    <input type="text" id="totalInput" list="totalOptions" placeholder="Goal Total" class="input-field w-full p-4 rounded-2xl uppercase font-semibold">
+                </div>
+
+                <button onclick="calculatePrediction()" class="btn-predict w-full text-white font-bold py-5 rounded-2xl transition-all duration-300 uppercase tracking-[0.2em] text-sm mt-4">
+                    Generate Prediction
+                </button>
+
+                <a href="https://t.me/onekick_ofc" target="_blank" class="btn-telegram w-full flex items-center justify-center font-bold py-4 rounded-2xl transition-all duration-300 uppercase tracking-widest text-xs mt-2">
+                    Join Telegram
+                </a>
+
+                <div id="resultArea" class="hidden mt-8 p-6 bg-red-600/10 border-l-4 border-red-600 rounded-2xl text-center">
+                    <div id="selectionText" class="text-xl font-bold text-white"></div>
+                </div>
+            </div>
         </div>
-        
-        <div class="space-y-4">
-            <!-- Team Names -->
-            <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-xs font-bold text-gray-400 uppercase mb-1">အိမ်ကွင်းအသင်း</label>
-                    <input type="text" id="homeTeam" placeholder="Home Team" class="mt-1 block w-full bg-black border border-gray-800 text-white rounded-md shadow-sm p-2.5 focus:ring-red-600 focus:border-red-600 outline-none">
+
+        <!-- Daily Tips Page -->
+        <div id="tipsPage" class="hidden space-y-6">
+            <div class="flex justify-center mb-6 bg-white/5 rounded-2xl p-1">
+                <button id="tabCurrent" onclick="switchTipView('current')" class="flex-1 py-3 text-[10px] uppercase font-black tracking-widest rounded-xl bg-red-600 text-white transition-all">Current Tips</button>
+                <button id="tabHistory" onclick="switchTipView('history')" class="flex-1 py-3 text-[10px] uppercase font-black tracking-widest rounded-xl text-gray-500 transition-all">Result History</button>
+            </div>
+
+            <!-- Admin Control Panel -->
+            <div id="adminPanel" class="hidden p-6 modern-card border-red-600/30 space-y-3 mb-6">
+                <div class="flex justify-between items-center mb-2">
+                    <h3 class="text-[10px] font-black uppercase tracking-widest text-red-500">Admin Panel</h3>
+                    <button onclick="window.logoutAdmin()" class="text-[10px] text-gray-500 hover:text-white uppercase font-bold">Logout</button>
                 </div>
-                <div>
-                    <label class="block text-xs font-bold text-gray-400 uppercase mb-1">အဝေးကွင်းအသင်း</label>
-                    <input type="text" id="awayTeam" placeholder="Away Team" class="mt-1 block w-full bg-black border border-gray-800 text-white rounded-md shadow-sm p-2.5 focus:ring-red-600 focus:border-red-600 outline-none">
-                </div>
+                <input type="text" id="tipLeague" placeholder="League (e.g., PORTUGAL LIGA 1)" class="input-field w-full p-3 rounded-xl text-xs uppercase tracking-wider">
+                <input type="text" id="tipMatch" placeholder="Match (e.g., Sporting vs Famalicao)" class="input-field w-full p-3 rounded-xl text-xs">
+                <input type="text" id="tipPick" placeholder="Pick (e.g., Sporting ဘော်ဒီ)" class="input-field w-full p-3 rounded-xl text-xs">
+                <button onclick="window.addTip()" class="w-full bg-red-600 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-widest">Add New Tip</button>
             </div>
 
-            <!-- Favorite Team Select -->
-            <div>
-                <label class="block text-xs font-bold text-gray-400 uppercase mb-1">ကြေးပေးထားသည့်အသင်း</label>
-                <select id="favTeam" class="mt-1 block w-full bg-black border border-gray-800 text-white rounded-md shadow-sm p-2.5 focus:ring-red-600 focus:border-red-600 outline-none">
-                    <option value="">အသင်းရွေးချယ်ပါ</option>
-                    <option value="home">အိမ်ကွင်း</option>
-                    <option value="away">အဝေးကွင်း</option>
-                </select>
+            <div id="tipsContainer" class="space-y-6">
+                <div class="text-center py-10 text-gray-700 text-xs uppercase tracking-widest animate-pulse">Loading Tips...</div>
             </div>
 
-            <!-- Inputs -->
-            <div>
-                <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Asian Handicap (ဥပမာ: 1-10, -20)</label>
-                <input type="text" id="hdpInput" placeholder="HDP..." class="mt-1 block w-full bg-black border border-gray-800 text-white rounded-md shadow-sm p-2.5 focus:ring-red-600 focus:border-red-600 outline-none uppercase">
+            <div class="mt-10 text-center">
+                <button id="adminLoginBtn" onclick="window.showLoginModal()" class="text-[10px] text-gray-800 hover:text-red-500 font-bold uppercase tracking-widest transition-colors">Staff Login</button>
             </div>
+        </div>
 
-            <div>
-                <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Asian Total (ဥပမာ: 3+20, 2-80)</label>
-                <input type="text" id="totalInput" placeholder="TOTAL..." class="mt-1 block w-full bg-black border border-gray-800 text-white rounded-md shadow-sm p-2.5 focus:ring-red-600 focus:border-red-600 outline-none uppercase">
-            </div>
+        <footer class="mt-12 text-center">
+            <p class="text-[10px] text-gray-600 font-bold uppercase tracking-[0.3em]">One Kick Official Bot v2.6.0</p>
+        </footer>
+    </div>
 
-            <!-- Predict Button -->
-            <button onclick="predictMatch()" class="w-full bg-red-700 text-white font-black py-4 px-4 rounded-lg hover:bg-red-600 transition duration-200 uppercase tracking-widest shadow-lg shadow-red-900/20">
-                Predict Now
-            </button>
-
-            <!-- Telegram Join Button (Changed to Blue) -->
-            <a href="https://t.me/onekick_ofc" target="_blank" class="w-full border-2 border-[#0088cc] text-[#0088cc] font-bold py-3 px-4 rounded-lg hover:bg-[#0088cc] hover:text-white transition duration-200 flex items-center justify-center gap-2">
-                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .33z"/></svg>
-                Telegram Join ရန်
-            </a>
-
-            <!-- Result Area -->
-            <div id="resultBox" class="mt-6 hidden p-5 rounded-lg border">
-                <h2 id="resultTitle" class="font-bold text-xl mb-2"></h2>
-                <p id="resultContent" class="text-white text-lg font-bold"></p>
-                <p id="resultWarning" class="mt-3 text-red-400 font-medium italic text-sm leading-relaxed"></p>
+    <!-- Login Modal -->
+    <div id="loginModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-6 modal-overlay">
+        <div class="modern-card w-full max-w-sm p-8 border-red-600/50 shadow-2xl">
+            <h2 class="text-xl font-black mb-6 text-center tracking-tight text-white uppercase">Admin Access</h2>
+            <input type="password" id="adminPassword" placeholder="Password" class="input-field w-full p-4 rounded-xl text-center font-bold mb-4 tracking-widest">
+            <div class="flex space-x-3">
+                <button onclick="window.hideLoginModal()" class="flex-1 bg-white/5 text-gray-400 font-bold py-3 rounded-xl text-xs uppercase tracking-widest">Cancel</button>
+                <button onclick="window.handleLogin()" class="flex-1 bg-red-600 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-widest">Login</button>
             </div>
         </div>
     </div>
 
-    <!-- Firebase Integration -->
+    <!-- Result Update Modal -->
+    <div id="resultModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-6 modal-overlay">
+        <div class="modern-card w-full max-w-sm p-8 border-blue-600/50">
+            <h2 class="text-xl font-black mb-6 text-center tracking-tight text-white uppercase">Set Match Result</h2>
+            <div class="grid grid-cols-1 gap-3">
+                <button onclick="window.updateMatchResult('win')" class="bg-green-600 text-white font-bold py-4 rounded-xl text-xs uppercase tracking-widest">WIN</button>
+                <button onclick="window.updateMatchResult('loss')" class="bg-red-600 text-white font-bold py-4 rounded-xl text-xs uppercase tracking-widest">LOSS</button>
+                <button onclick="window.updateMatchResult('draw')" class="bg-gray-600 text-white font-bold py-4 rounded-xl text-xs uppercase tracking-widest">DRAW</button>
+                <button onclick="window.updateMatchResult('pending')" class="bg-indigo-900 text-white font-bold py-4 rounded-xl text-xs uppercase tracking-widest">PENDING</button>
+                <button onclick="window.closeResultModal()" class="mt-4 text-gray-500 text-[10px] font-bold uppercase">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <datalist id="hdpOptions">
+        <option value="-10"><option value="-15"><option value="-20"><option value="-25"><option value="-30"><option value="-35"><option value="-40">
+    </datalist>
+    <datalist id="totalOptions">
+        <option value="2-80"><option value="2-90"><option value="3+20"><option value="3+30"><option value="3+40">
+    </datalist>
+
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-        import { getAnalytics, logEvent } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-analytics.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, updateDoc, serverTimestamp, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
         const firebaseConfig = {
-            apiKey: "AIzaSyD5-o9cN6XQoLSB8gzCAyewju5utqLAr10",
-            authDomain: "one-kick-official.firebaseapp.com",
-            projectId: "one-kick-official",
-            storageBucket: "one-kick-official.firebasestorage.app",
-            messagingSenderId: "10860561236",
-            appId: "1:10860561236:web:3b036438ce9c84cb2c7ec1",
-            measurementId: "G-0RC4Z6EDWV"
+            apiKey: "AIzaSyBcetLiZbDLV3DilnQxqCpYQy0L22P-2GA",
+            authDomain: "one-kick-official-2.firebaseapp.com",
+            projectId: "one-kick-official-2",
+            storageBucket: "one-kick-official-2.firebasestorage.app",
+            messagingSenderId: "852449306479",
+            appId: "1:852449306479:web:98710d8143488d1014ea9a",
+            measurementId: "G-XJ0GSN4W2G"
         };
 
         const app = initializeApp(firebaseConfig);
-        const analytics = getAnalytics(app);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+        const appId = "one-kick-official-2";
+        const tipsCollection = collection(db, 'artifacts', appId, 'public', 'data', 'daily_tips');
 
-        window.logPredictionEvent = (prediction) => {
-            logEvent(analytics, 'prediction_made', {
-                prediction_result: prediction
+        let user = null;
+        let isAdmin = localStorage.getItem('onekick_admin') === 'true'; // Remember login state
+        let activeTipView = 'current'; 
+        let selectedMatchId = null;
+
+        // Sync Admin Panel UI
+        if(isAdmin) {
+            document.addEventListener('DOMContentLoaded', () => {
+                document.getElementById('adminPanel').classList.remove('hidden');
+                document.getElementById('adminLoginBtn').classList.add('hidden');
             });
-        };
-    </script>
-
-    <script>
-        function predictMatch() {
-            const hdp = document.getElementById('hdpInput').value.trim().replace(/\s/g, '');
-            const total = document.getElementById('totalInput').value.trim().replace(/\s/g, '');
-            const home = document.getElementById('homeTeam').value || "အိမ်ကွင်း";
-            const away = document.getElementById('awayTeam').value || "အဝေးကွင်း";
-            const fav = document.getElementById('favTeam').value;
-            
-            const favTeamName = fav === 'home' ? home : (fav === 'away' ? away : "ကြေးပေးအသင်း");
-
-            const resultBox = document.getElementById('resultBox');
-            const resultTitle = document.getElementById('resultTitle');
-            const resultContent = document.getElementById('resultContent');
-            const resultWarning = document.getElementById('resultWarning');
-
-            resultBox.className = "mt-6 hidden p-5 rounded-lg border";
-            resultWarning.innerText = "";
-            let prediction = null;
-            let warningText = "";
-
-            const isHdpRange1_10to1_30 = (val) => ['1-10', '1-15', '1-20', '1-25', '1-30'].includes(val);
-            const isHdpRange1Plus20to40 = (val) => ['1+20', '1+25', '1+30', '1+35', '1+40'].includes(val);
-            const list3_3PlusRange = ['3=', '3+5', '3+10', '3+15', '3+20', '3+25', '3+30', '3+35', '3+40'];
-            const listHdpF3F4 = ['=', '-10', '-15', '-20', '-25', '-30', '-35', '-40', '-80', '-85', '-90', '-95', '-100', '1+100', '1+95', '1+90', '1+85', '1+80'];
-
-            if (isHdpRange1_10to1_30(hdp) && ['2-80', '2-90', '2-100'].includes(total)) {
-                prediction = "ရွေးချယ်မှု : ဂိုးပေါ်";
-            } else if (isHdpRange1Plus20to40(hdp) && ['3+20', '3+25', '3+30', '3+35', '3+40'].includes(total)) {
-                prediction = `ရွေးချယ်မှု : ${favTeamName} , ဂိုးပေါ်`;
-            } else if (listHdpF3F4.includes(hdp) && list3_3PlusRange.includes(total)) {
-                prediction = "ရွေးချယ်မှု : ဂိုးပေါ်";
-            } else if (listHdpF3F4.includes(hdp) && ['3-10', '3-15', '3-20', '3-25', '3-30'].includes(total)) {
-                prediction = "ရွေးချယ်မှု : ဂိုးပေါ်";
-                warningText = "2 သင်းပေါင်းအနည်းဆုံး 3 လုံးရောက်နိုင်ပေမယ့် 4 လုံးရောက်ဖို့ အနည်းငယ်လေး ခက်ပါလိမ့်မယ်။ Total Over 2.5 က ဒီပွဲ ပို Safe ဖြစ်ပါတယ်။";
-            } else if (['1-20', '1-30', '1-40'].includes(hdp) && ['3+20', '3+30', '3+40'].includes(total)) {
-                prediction = "ရွေးချယ်မှု : ဂိုးပေါ်";
-            } else if (['1-80', '1-85', '1-90', '1-95', '1-100'].includes(hdp) && ['3-80', '3-85', '3-90', '3-95', '3-100'].includes(total)) {
-                prediction = `ရွေးချယ်မှု : ${favTeamName} , ဂိုးပေါ်`;
-            } else if (['-20', '-25', '-30'].includes(hdp) && ['2-80', '2-85', '2-90', '2-95', '2-100', '3+80', '3+85', '3+90', '3+95', '3+100'].includes(total)) {
-                prediction = "ရွေးချယ်မှု : ဂိုးပေါ်";
-            } else if (['=', '-5', '-10', '-15', '20', '-25', '-30', '-35', '-40'].includes(hdp) && ['2=', '2-5', '2-10', '2-15', '2-20', '2-25', '2-30', '2-35', '2-40'].includes(total)) {
-                prediction = "ရွေးချယ်မှု : ဂိုးအောက်";
-            } else if (['1+50', '1+55', '1+65', '1+75', '1+85', '1+60', '1+70', '1+80', '1+90'].includes(hdp) && ['2-60', '2-65', '2-70', '2-75', '2-80'].includes(total)) {
-                prediction = "ရွေးချယ်မှု : ဂိုးအောက်";
-            } else if (['1-70', '1-75', '1-80', '1-85', '1-90', '1-95', '1-100'].includes(hdp) && list3_3PlusRange.includes(total)) {
-                prediction = "ရွေးချယ်မှု : ဂိုးပေါ်";
-            } else if (['-40', '-45', '-50', '-55', '-60'].includes(hdp) && ['3-40', '3-45', '3-50', '3-55', '3-60'].includes(total)) {
-                prediction = "ရွေးချယ်မှု : ဂိုးအောက်";
-            }
-
-            if (prediction) {
-                resultBox.classList.remove('hidden');
-                resultBox.classList.add('bg-black', 'border-red-600');
-                resultTitle.innerText = "Match Analysis Found!";
-                resultTitle.className = "font-black text-xl mb-2 text-red-500 uppercase";
-                resultContent.innerText = prediction;
-                resultWarning.innerText = warningText;
-
-                if (window.logPredictionEvent) {
-                    window.logPredictionEvent(prediction);
-                }
-            } else {
-                resultBox.classList.remove('hidden');
-                resultBox.classList.add('bg-black', 'border-gray-800');
-                resultTitle.innerText = "No Prediction";
-                resultTitle.className = "font-bold text-lg mb-2 text-gray-500 uppercase";
-                resultContent.innerText = "Formula မဝင်ပါ။ ရွေးချယ်မှု မရှိပါ။";
-                resultWarning.innerText = "";
-            }
         }
+
+        async function initAuth() {
+            try {
+                await signInAnonymously(auth);
+                onAuthStateChanged(auth, (u) => {
+                    user = u;
+                    if(user) loadTips();
+                });
+            } catch (err) { console.error("Firebase Auth Error", err); }
+        }
+        initAuth();
+
+        function loadTips() {
+            if (!user) return;
+            
+            // fetch all data and filter in JS memory as per Rule 2
+            onSnapshot(tipsCollection, (snapshot) => {
+                const container = document.getElementById('tipsContainer');
+                if(!container) return;
+                
+                container.innerHTML = '';
+                let tips = [];
+                snapshot.forEach(doc => tips.push({ id: doc.id, ...doc.data() }));
+
+                // Filtering logic
+                if (activeTipView === 'current') {
+                    tips = tips.filter(t => t.result === 'pending' || !t.result);
+                } else {
+                    tips = tips.filter(t => t.result && t.result !== 'pending');
+                }
+                
+                // Sorting logic
+                tips.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+
+                if (tips.length === 0) {
+                    container.innerHTML = `<div class="text-center py-20 text-gray-700 text-xs uppercase tracking-widest">No ${activeTipView} matches found.</div>`;
+                    return;
+                }
+
+                tips.forEach(tip => {
+                    const statusClass = tip.result ? `status-${tip.result}` : 'status-pending';
+                    const themeClass = tip.result === 'win' ? 'card-win' : (tip.result === 'loss' ? 'card-loss' : '');
+                    const statusText = tip.result || 'pending';
+                    
+                    const card = document.createElement('div');
+                    card.className = `tip-card ${themeClass} shadow-2xl animate-in fade-in duration-500 mb-6`;
+                    card.innerHTML = `
+                        <div class="league-tag">${tip.league || 'FOOTBALL LEAGUE'}</div>
+                        <div class="match-title">${tip.match}</div>
+                        <div class="choice-box">
+                            <span class="choice-text-label">Choice : </span>
+                            <span class="choice-text-value">${tip.pick}</span>
+                        </div>
+                        <div class="status-badge ${statusClass}">${statusText}</div>
+                        
+                        ${isAdmin ? `
+                        <div class="absolute top-4 right-4 flex space-x-2">
+                            <button onclick="window.openResultModal('${tip.id}')" class="bg-blue-600/20 text-blue-400 p-2 rounded-lg font-bold text-[8px] uppercase tracking-tighter">Result</button>
+                            <button onclick="window.deleteTip('${tip.id}')" class="bg-red-600/20 text-red-500 p-2 rounded-lg font-bold text-[8px] uppercase tracking-tighter">Del</button>
+                        </div>` : ''}
+                    `;
+                    container.appendChild(card);
+                });
+            }, (error) => {
+                console.error("Firestore Listen Error:", error);
+            });
+        }
+
+        window.handleLogin = () => {
+            const pass = document.getElementById('adminPassword').value;
+            if (pass === "admin123") {
+                isAdmin = true;
+                localStorage.setItem('onekick_admin', 'true'); // Persist login
+                document.getElementById('adminPanel').classList.remove('hidden');
+                document.getElementById('adminLoginBtn').classList.add('hidden');
+                window.hideLoginModal();
+                loadTips();
+            } else {
+                alert("Incorrect Password!");
+                document.getElementById('adminPassword').value = '';
+            }
+        };
+
+        window.logoutAdmin = () => {
+            isAdmin = false;
+            localStorage.removeItem('onekick_admin'); // Clear persisted login
+            document.getElementById('adminPanel').classList.add('hidden');
+            document.getElementById('adminLoginBtn').classList.remove('hidden');
+            loadTips(); // Refresh view to hide admin buttons
+        };
+
+        window.addTip = async () => {
+            if (!isAdmin || !user) return;
+            const league = document.getElementById('tipLeague').value.trim();
+            const match = document.getElementById('tipMatch').value.trim();
+            const pick = document.getElementById('tipPick').value.trim();
+            if (!match || !pick) return;
+
+            try {
+                await addDoc(tipsCollection, { 
+                    league: league || "GENERAL", 
+                    match, 
+                    pick, 
+                    result: 'pending',
+                    createdAt: serverTimestamp() 
+                });
+                document.getElementById('tipLeague').value = '';
+                document.getElementById('tipMatch').value = '';
+                document.getElementById('tipPick').value = '';
+            } catch (e) { console.error("Firestore Write Error", e); }
+        };
+
+        window.updateMatchResult = async (status) => {
+            if (!selectedMatchId || !isAdmin || !user) return;
+            try {
+                const matchDoc = doc(db, 'artifacts', appId, 'public', 'data', 'daily_tips', selectedMatchId);
+                await updateDoc(matchDoc, { result: status });
+                window.closeResultModal();
+            } catch (e) { console.error("Update Error", e); }
+        };
+
+        window.deleteTip = async (id) => {
+            if (!isAdmin || !user) return;
+            if(confirm("Confirm Delete Match?")) {
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'daily_tips', id));
+            }
+        };
+
+        // Utility functions
+        window.switchTipView = (view) => {
+            activeTipView = view;
+            const tabCurrent = document.getElementById('tabCurrent');
+            const tabHistory = document.getElementById('tabHistory');
+            if (view === 'current') {
+                tabCurrent.className = 'flex-1 py-3 text-[10px] uppercase font-black tracking-widest rounded-xl bg-red-600 text-white transition-all';
+                tabHistory.className = 'flex-1 py-3 text-[10px] uppercase font-black tracking-widest rounded-xl text-gray-500 transition-all';
+            } else {
+                tabHistory.className = 'flex-1 py-3 text-[10px] uppercase font-black tracking-widest rounded-xl bg-red-600 text-white transition-all';
+                tabCurrent.className = 'flex-1 py-3 text-[10px] uppercase font-black tracking-widest rounded-xl text-gray-500 transition-all';
+            }
+            loadTips();
+        };
+
+        window.openResultModal = (id) => { selectedMatchId = id; document.getElementById('resultModal').classList.remove('hidden'); };
+        window.closeResultModal = () => { selectedMatchId = null; document.getElementById('resultModal').classList.add('hidden'); };
+        window.showLoginModal = () => document.getElementById('loginModal').classList.remove('hidden');
+        window.hideLoginModal = () => document.getElementById('loginModal').classList.add('hidden');
+        window.switchPage = (page) => {
+            document.getElementById('botPage').classList.toggle('hidden', page !== 'bot');
+            document.getElementById('tipsPage').classList.toggle('hidden', page !== 'tips');
+            document.getElementById('navBot').classList.toggle('active', page === 'bot');
+            document.getElementById('navTips').classList.toggle('active', page === 'tips');
+        };
+
+        window.calculatePrediction = () => {
+            const hdp = document.getElementById('hdpInput').value.trim();
+            const total = document.getElementById('totalInput').value.trim();
+            let selection = (hdp === "-10" && total === "3+20") ? "ဂိုးပေါ် (Over)" : "ကိုက်ညီသည့် Formula မရှိပါ။";
+            if (hdp === "-20" && total === "2-80") selection = "ဂိုးပေါ် (Over)";
+            const resultArea = document.getElementById('resultArea');
+            resultArea.classList.remove('hidden');
+            document.getElementById('selectionText').innerHTML = `Selection: <span class="text-red-500">${selection}</span>`;
+        };
     </script>
 </body>
 </html>
