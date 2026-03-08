@@ -95,7 +95,7 @@
         }
 
         .match-title {
-            font-size: 1.15rem; /* Reduced for mobile */
+            font-size: 1.15rem; 
             font-weight: 700;
             letter-spacing: -0.01em;
             margin-bottom: 1.25rem;
@@ -112,13 +112,13 @@
 
         .choice-text-label {
             color: #ff0000;
-            font-size: 0.9rem; /* Reduced */
+            font-size: 0.9rem;
             font-weight: 700;
         }
 
         .choice-text-value {
             color: #ffffff;
-            font-size: 0.95rem; /* Reduced */
+            font-size: 0.95rem; 
             font-weight: 700;
         }
 
@@ -204,7 +204,6 @@
                 <button id="tabHistory" onclick="switchTipView('history')" class="flex-1 py-2.5 text-[9px] uppercase font-black tracking-widest rounded-lg text-gray-500 transition-all">History</button>
             </div>
 
-            <!-- Admin Control Panel -->
             <div id="adminPanel" class="hidden p-4 modern-card border-red-600/30 space-y-2 mb-4">
                 <div class="flex justify-between items-center mb-1">
                     <h3 class="text-[9px] font-black uppercase tracking-widest text-red-500">Admin Panel</h3>
@@ -226,11 +225,11 @@
         </div>
 
         <footer class="mt-8 text-center">
-            <p class="text-[9px] text-gray-700 font-bold uppercase tracking-[0.3em]">One Kick Official Bot v2.8.5</p>
+            <p class="text-[9px] text-gray-700 font-bold uppercase tracking-[0.3em]">One Kick Official Bot v2.9.0</p>
         </footer>
     </div>
 
-    <!-- Modals (Login/Result) -->
+    <!-- Modals -->
     <div id="loginModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-6 modal-overlay">
         <div class="modern-card w-full max-w-xs p-6 border-red-600/50 shadow-2xl">
             <h2 class="text-lg font-black mb-4 text-center tracking-tight text-white uppercase">Admin</h2>
@@ -256,15 +255,15 @@
     </div>
 
     <datalist id="hdpOptions">
-        <option value="="><option value="-10"><option value="-15"><option value="-20"><option value="-25"><option value="-30"><option value="-35"><option value="-40"><option value="-45"><option value="-50"><option value="-55"><option value="-60"><option value="-80"><option value="-85"><option value="-90"><option value="-95"><option value="-100">
-        <option value="1-10"><option value="1-20"><option value="1-30"><option value="1-40"><option value="1-70"><option value="1-75"><option value="1-80"><option value="1-85"><option value="1-90"><option value="1-95"><option value="1-100">
-        <option value="1+20"><option value="1+40"><option value="1+80"><option value="1+85"><option value="1+90"><option value="1+95"><option value="1+100">
+        <option value="="><option value="-5"><option value="-10"><option value="-15"><option value="-20"><option value="-25"><option value="-30"><option value="-35"><option value="-40"><option value="-45"><option value="-50"><option value="-55"><option value="-60"><option value="-80"><option value="-85"><option value="-90"><option value="-95"><option value="-100">
+        <option value="1="><option value="1-5"><option value="1-10"><option value="1-15"><option value="1-20"><option value="1-25"><option value="1-30"><option value="1-35"><option value="1-40"><option value="1-70"><option value="1-75"><option value="1-80"><option value="1-85"><option value="1-90"><option value="1-95"><option value="1-100">
+        <option value="1+5"><option value="1+10"><option value="1+15"><option value="1+20"><option value="1+25"><option value="1+30"><option value="1+35"><option value="1+40"><option value="1+50"><option value="1+55"><option value="1+60"><option value="1+65"><option value="1+70"><option value="1+75"><option value="1+80"><option value="1+85"><option value="1+90"><option value="1+95"><option value="1+100">
     </datalist>
     <datalist id="totalOptions">
-        <option value="2="><option value="2-80"><option value="2-90"><option value="2-100">
-        <option value="3="><option value="3+5"><option value="3+10"><option value="3+20"><option value="3+25"><option value="3+30"><option value="3+35"><option value="3+40"><option value="3+45"><option value="3+50"><option value="3+55"><option value="3+60">
-        <option value="3-10"><option value="3-15"><option value="3-20"><option value="3-25"><option value="3-30"><option value="3-40"><option value="3-45"><option value="3-50"><option value="3-55"><option value="3-60">
-        <option value="3-80"><option value="3-100">
+        <option value="2="><option value="2-5"><option value="2-10"><option value="2-15"><option value="2-20"><option value="2-25"><option value="2-30"><option value="2-35"><option value="2-40"><option value="2-60"><option value="2-65"><option value="2-70"><option value="2-75"><option value="2-80"><option value="2-85"><option value="2-90"><option value="2-95"><option value="2-100">
+        <option value="3="><option value="3-5"><option value="3-10"><option value="3-15"><option value="3-20"><option value="3-25"><option value="3-30"><option value="3-35"><option value="3-40"><option value="3-45"><option value="3-50"><option value="3-55"><option value="3-60">
+        <option value="3+5"><option value="3+10"><option value="3+15"><option value="3+20"><option value="3+25"><option value="3+30"><option value="3+35"><option value="3+40"><option value="3+45"><option value="3+50"><option value="3+80"><option value="3+85"><option value="3+90"><option value="3+95"><option value="3+100">
+        <option value="3-80"><option value="3-85"><option value="3-90"><option value="3-95"><option value="3-100">
     </datalist>
 
     <script type="module">
@@ -351,45 +350,45 @@
             });
         }
 
-        // Logic Functions
+        // --- NEW FORMULA LOGIC ---
         window.calculatePrediction = () => {
             const hdp = document.getElementById('hdpInput').value.trim().toLowerCase();
             const total = document.getElementById('totalInput').value.trim().toLowerCase();
             const favType = document.getElementById('favTeamSelect').value;
-            const homeName = document.getElementById('homeTeam').value || "Home";
-            const awayName = document.getElementById('awayTeam').value || "Away";
+            const homeName = document.getElementById('homeTeam').value || "Home Team";
+            const awayName = document.getElementById('awayTeam').value || "Away Team";
             const favName = (favType === 'home') ? homeName : awayName;
 
             let selection = "";
             let warning = "";
 
             // Formula 1
-            const f1_hdp = ["1-10", "1-20", "1-30"];
-            const f1_total = ["2-80", "2-90", "2-100"];
+            const f1_hdp = ["1-10", "1-15", "1-20", "1-25", "1-30"];
+            const f1_total = ["2-80", "2-85", "2-90", "2-95", "2-100"];
             if (f1_hdp.includes(hdp) && f1_total.includes(total)) selection = "ဂိုးပေါ်";
 
             // Formula 2
-            const f2_hdp = ["1+20", "1+25", "1+30", "1+35", "1+40"];
-            const f2_total = ["3+20", "3+25", "3+30", "3+35", "3+40"];
+            const f2_hdp = ["1=", "1+5", "1+10", "1+15", "1+20", "1+25", "1+30", "1+35", "1+40"];
+            const f2_total = ["3=", "3-5", "3-10", "3-15", "3-20", "3-25", "3-30", "3-35", "3-40", "3+5", "3+10", "3+15", "3+20", "3+25", "3+30", "3+35", "3+40"];
             if (f2_hdp.includes(hdp) && f2_total.includes(total)) selection = `${favName}, ဂိုးပေါ်`;
 
-            // Shared HDP for F3 and F4
-            const shared_hdp = ["=", "-10", "-15", "-20", "-25", "-30", "-35", "-40", "-80", "-85", "-90", "-95", "-100", "1+100", "1+95", "1+90", "1+85", "1+80"];
-
+            // Formula 3 & 4 base HDP
+            const f34_hdp = ["=", "-10", "-15", "-20", "-25", "-30", "-35", "-40", "-80", "-85", "-90", "-95", "-100", "1+100", "1+95", "1+90", "1+85", "1+80"];
+            
             // Formula 3
             const f3_total = ["3=", "3+5", "3+10", "3+15", "3+20", "3+25", "3+30", "3+35", "3+40"];
-            if (shared_hdp.includes(hdp) && f3_total.includes(total)) selection = "ဂိုးပေါ်";
+            if (f34_hdp.includes(hdp) && f3_total.includes(total)) selection = "ဂိုးပေါ်";
 
             // Formula 4
             const f4_total = ["3-10", "3-15", "3-20", "3-25", "3-30"];
-            if (shared_hdp.includes(hdp) && f4_total.includes(total)) {
+            if (f34_hdp.includes(hdp) && f4_total.includes(total)) {
                 selection = "ဂိုးပေါ်";
-                warning = "၂ သင်းပေါင်း အနည်းဆုံး ၃ လုံးရောက်နိုင်ပေမယ့် ၄ လုံးရောက်ဖို့ အနည်းငယ်လေး ခက်ပါလိမ့်မယ်။ Total Over 2.5 က ဒီပွဲ ပို Safe ဖြစ်ပါတယ်။";
+                warning = "2 သင်းပေါင်းအနည်းဆုံး 3 လုံးရောက်နိုင်ပေမယ့် 4 လုံးရောက်ဖို့ အနည်းငယ်လေး ခက်ပါလိမ့်မယ်။ Total Over 2.5 က ဒီပွဲ ပို Safe ဖြစ်ပါတယ်။";
             }
 
             // Formula 5
-            const f5_hdp = ["1-20", "1-30", "1-40"];
-            const f5_total = ["3+20", "3+30", "3+40"];
+            const f5_hdp = ["1=", "1-5", "1-10", "1-15", "1-20", "1-25", "1-30", "1-35", "1-40"];
+            const f5_total = ["3=", "3-5", "3-10", "3-15", "3-20", "3-25", "3-30", "3-35", "3-40", "3+5", "3+10", "3+15", "3+20", "3+25", "3+30", "3+35", "3+40"];
             if (f5_hdp.includes(hdp) && f5_total.includes(total)) selection = "ဂိုးပေါ်";
 
             // Formula 6
@@ -424,8 +423,13 @@
 
             // Formula 12
             const f12_hdp = ["-40", "-45", "-50", "-55", "-60"];
-            const f12_total = ["3+40", "3+45", "3+50", "3+55", "3+60"];
-            if (f12_hdp.includes(hdp) && f12_total.includes(total)) selection = "ဂိုးပေါ်";
+            const f12_total = ["3=", "3-5", "3-10", "3-15", "3-20", "3-25", "3-30", "3-35", "3-40", "3+5", "3+10", "3+15", "3+20", "3+25", "3+30", "3+35", "3+40", "3+45", "3+50"];
+            if (f12_hdp.includes(hdp) && f12_total.includes(total)) selection = "ဂိုးအောက်";
+
+            // Formula 13
+            const f13_hdp = ["=", "-5", "-10", "-15", "-20", "-25", "-30", "-35", "-40", "-45", "-50", "-55", "-60", "-65", "-70", "-75", "-80", "-85", "-90", "-95", "-100"];
+            const f13_total = ["2=", "2-5", "2-10", "2-15", "2-20", "2-25", "2-30", "2-35", "2-40"];
+            if (f13_hdp.includes(hdp) && f13_total.includes(total)) selection = "ဂိုးအောက်";
 
             const resultArea = document.getElementById('resultArea');
             resultArea.classList.remove('hidden');
@@ -439,7 +443,7 @@
             }
         };
 
-        // UI Management
+        // UI Helpers
         window.handleLogin = () => {
             if (document.getElementById('adminPassword').value === "admin123") {
                 isAdmin = true; localStorage.setItem('onekick_admin', 'true');
