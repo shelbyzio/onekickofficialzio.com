@@ -192,7 +192,8 @@
                 </a>
 
                 <div id="resultArea" class="hidden mt-8 p-6 bg-red-600/10 border-l-4 border-red-600 rounded-2xl text-center">
-                    <div id="selectionText" class="text-xl font-bold text-white"></div>
+                    <div id="selectionText" class="text-xl font-bold text-white mb-2"></div>
+                    <div id="warningText" class="text-xs text-yellow-500 font-medium italic mt-2 px-4 leading-relaxed"></div>
                 </div>
             </div>
         </div>
@@ -226,11 +227,11 @@
         </div>
 
         <footer class="mt-12 text-center">
-            <p class="text-[10px] text-gray-600 font-bold uppercase tracking-[0.3em]">One Kick Official Bot v2.7.0</p>
+            <p class="text-[10px] text-gray-600 font-bold uppercase tracking-[0.3em]">One Kick Official Bot v2.8.0</p>
         </footer>
     </div>
 
-    <!-- Login Modal -->
+    <!-- Modals (Login/Result) -->
     <div id="loginModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-6 modal-overlay">
         <div class="modern-card w-full max-w-sm p-8 border-red-600/50 shadow-2xl">
             <h2 class="text-xl font-black mb-6 text-center tracking-tight text-white uppercase">Admin Access</h2>
@@ -242,7 +243,6 @@
         </div>
     </div>
 
-    <!-- Result Update Modal -->
     <div id="resultModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-6 modal-overlay">
         <div class="modern-card w-full max-w-sm p-8 border-blue-600/50">
             <h2 class="text-xl font-black mb-6 text-center tracking-tight text-white uppercase">Set Match Result</h2>
@@ -257,35 +257,34 @@
     </div>
 
     <datalist id="hdpOptions">
-        <option value="-10"><option value="-15"><option value="-20"><option value="-25"><option value="-30"><option value="-35"><option value="-40">
+        <option value="="><option value="-10"><option value="-15"><option value="-20"><option value="-25"><option value="-30"><option value="-35"><option value="-40"><option value="-45"><option value="-50"><option value="-55"><option value="-60"><option value="-80"><option value="-85"><option value="-90"><option value="-95"><option value="-100">
+        <option value="1-10"><option value="1-20"><option value="1-30"><option value="1-40"><option value="1-70"><option value="1-75"><option value="1-80"><option value="1-85"><option value="1-90"><option value="1-95"><option value="1-100">
+        <option value="1+20"><option value="1+40"><option value="1+80"><option value="1+85"><option value="1+90"><option value="1+95"><option value="1+100">
     </datalist>
     <datalist id="totalOptions">
-        <option value="2-80"><option value="2-90"><option value="3+20"><option value="3+30"><option value="3+40">
+        <option value="2="><option value="2-80"><option value="2-90"><option value="2-100">
+        <option value="3="><option value="3+5"><option value="3+10"><option value="3+20"><option value="3+25"><option value="3+30"><option value="3+35"><option value="3+40"><option value="3+45"><option value="3+50"><option value="3+55"><option value="3+60">
+        <option value="3-10"><option value="3-15"><option value="3-20"><option value="3-25"><option value="3-30"><option value="3-40"><option value="3-45"><option value="3-50"><option value="3-55"><option value="3-60">
+        <option value="3-80"><option value="3-100">
     </datalist>
 
     <script type="module">
-        // Firebase 12.10.0 Imports
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, updateDoc, serverTimestamp, disableNetwork, enableNetwork } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+        import { initializeFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
 
-        // Provided Config
         const firebaseConfig = {
             apiKey: "AIzaSyBcetLiZbDLV3DilnQxqCpYQy0L22P-2GA",
             authDomain: "one-kick-official-2.firebaseapp.com",
             projectId: "one-kick-official-2",
             storageBucket: "one-kick-official-2.firebasestorage.app",
-            messagingSenderId: "852449306479",
-            appId: "1:852449306479:web:98710d8143488d1014ea9a",
-            measurementId: "G-XJ0GSN4W2G"
+            appId: "1:852449306479:web:98710d8143488d1014ea9a"
         };
         const appId = "one-kick-official-2";
 
         const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+        const db = initializeFirestore(app, { experimentalForceLongPolling: true });
         const auth = getAuth(app);
-        
-        // Path Rule 1
         const tipsCollection = collection(db, 'artifacts', appId, 'public', 'data', 'daily_tips');
 
         let isAdmin = localStorage.getItem('onekick_admin') === 'true'; 
@@ -295,80 +294,48 @@
 
         async function startApp() {
             updateAdminUI();
-            
-            // Rule 3: Auth first
             onAuthStateChanged(auth, (user) => {
-                if (user) {
-                    console.log("Logged in:", user.uid);
-                    setupTipsListener();
-                } else {
-                    signInAnonymously(auth).catch(e => console.error("Auth Fail", e));
-                }
+                if (user) setupTipsListener();
+                else signInAnonymously(auth).catch(e => setupTipsListener());
             });
         }
 
         function updateAdminUI() {
             const panel = document.getElementById('adminPanel');
             const loginBtn = document.getElementById('adminLoginBtn');
-            if (isAdmin) {
-                panel?.classList.remove('hidden');
-                loginBtn?.classList.add('hidden');
-            } else {
-                panel?.classList.add('hidden');
-                loginBtn?.classList.remove('hidden');
-            }
+            if (isAdmin) { panel?.classList.remove('hidden'); loginBtn?.classList.add('hidden'); }
+            else { panel?.classList.add('hidden'); loginBtn?.classList.remove('hidden'); }
         }
 
         function setupTipsListener() {
             if (unsubscribeTips) unsubscribeTips();
-
             const loader = document.getElementById('loader');
-            if (loader) {
-                loader.classList.remove('hidden');
-                loader.innerText = "Connecting to Live Server...";
-            }
+            if (loader) loader.classList.remove('hidden');
 
-            // Simple Collection Query (Rule 2)
-            unsubscribeTips = onSnapshot(tipsCollection, { includeMetadataChanges: false }, (snapshot) => {
+            unsubscribeTips = onSnapshot(tipsCollection, (snapshot) => {
                 const container = document.getElementById('tipsContainer');
                 if (!container) return;
                 if (loader) loader.classList.add('hidden');
 
                 let allTips = [];
-                snapshot.forEach(doc => {
-                    allTips.push({ id: doc.id, ...doc.data() });
-                });
-
-                // Filter & Sort in JS (Rule 2)
-                let filteredTips = allTips.filter(t => {
-                    const isPending = !t.result || t.result === 'pending';
-                    return activeTipView === 'current' ? isPending : !isPending;
-                });
-
+                snapshot.forEach(doc => { allTips.push({ id: doc.id, ...doc.data() }); });
+                let filteredTips = allTips.filter(t => (activeTipView === 'current' ? (!t.result || t.result === 'pending') : (t.result && t.result !== 'pending')));
                 filteredTips.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
-
                 renderTips(filteredTips);
-
-            }, (error) => {
-                console.error("Live Sync Error:", error.message);
-                if (loader) loader.innerHTML = `<span class="text-red-500">Online Access Error.</span>`;
-            });
+            }, (error) => { setTimeout(setupTipsListener, 5000); });
         }
 
         function renderTips(tips) {
             const container = document.getElementById('tipsContainer');
             if (!container) return;
             container.innerHTML = '';
-
             if (tips.length === 0) {
                 container.innerHTML = `<div class="text-center py-20 text-gray-800 text-[10px] uppercase font-bold tracking-widest border border-red-900/20 rounded-3xl">No ${activeTipView} tips found.</div>`;
                 return;
             }
-
             tips.forEach(tip => {
                 const statusClass = tip.result ? `status-${tip.result}` : 'status-pending';
                 const themeClass = tip.result === 'win' ? 'card-win' : (tip.result === 'loss' ? 'card-loss' : '');
-                
                 const card = document.createElement('div');
                 card.className = `tip-card ${themeClass} shadow-2xl mb-6`;
                 card.innerHTML = `
@@ -379,85 +346,148 @@
                         <span class="choice-text-value">${tip.pick}</span>
                     </div>
                     <div class="status-badge ${statusClass}">${tip.result || 'pending'}</div>
-                    
-                    ${isAdmin ? `
-                    <div class="absolute top-4 right-4 flex space-x-2">
-                        <button onclick="window.openResultModal('${tip.id}')" class="bg-blue-600/30 text-blue-400 p-2 px-3 rounded-lg font-bold text-[8px]">EDIT</button>
-                        <button onclick="window.deleteTip('${tip.id}')" class="bg-red-600/30 text-red-500 p-2 px-3 rounded-lg font-bold text-[8px]">DEL</button>
-                    </div>` : ''}
+                    ${isAdmin ? `<div class="absolute top-4 right-4 flex space-x-2"><button onclick="window.openResultModal('${tip.id}')" class="bg-blue-600/30 text-blue-400 p-2 px-3 rounded-lg font-bold text-[8px]">EDIT</button><button onclick="window.deleteTip('${tip.id}')" class="bg-red-600/30 text-red-500 p-2 px-3 rounded-lg font-bold text-[8px]">DEL</button></div>` : ''}
                 `;
                 container.appendChild(card);
             });
         }
 
+        // Logic Functions
+        window.calculatePrediction = () => {
+            const hdp = document.getElementById('hdpInput').value.trim().toLowerCase();
+            const total = document.getElementById('totalInput').value.trim().toLowerCase();
+            const favType = document.getElementById('favTeamSelect').value;
+            const homeName = document.getElementById('homeTeam').value || "Home";
+            const awayName = document.getElementById('awayTeam').value || "Away";
+            const favName = (favType === 'home') ? homeName : awayName;
+
+            let selection = "";
+            let warning = "";
+
+            // Formula 1
+            const f1_hdp = ["1-10", "1-20", "1-30"];
+            const f1_total = ["2-80", "2-90", "2-100"];
+            if (f1_hdp.includes(hdp) && f1_total.includes(total)) {
+                selection = "ဂိုးပေါ်";
+            }
+
+            // Formula 2
+            const f2_hdp = ["1+20", "1+25", "1+30", "1+35", "1+40"];
+            const f2_total = ["3+20", "3+25", "3+30", "3+35", "3+40"];
+            if (f2_hdp.includes(hdp) && f2_total.includes(total)) {
+                selection = `${favName}, ဂိုးပေါ်`;
+            }
+
+            // Shared HDP for F3 and F4
+            const shared_hdp = ["=", "-10", "-15", "-20", "-25", "-30", "-35", "-40", "-80", "-85", "-90", "-95", "-100", "1+100", "1+95", "1+90", "1+85", "1+80"];
+
+            // Formula 3
+            const f3_total = ["3=", "3+5", "3+10", "3+15", "3+20", "3+25", "3+30", "3+35", "3+40"];
+            if (shared_hdp.includes(hdp) && f3_total.includes(total)) {
+                selection = "ဂိုးပေါ်";
+            }
+
+            // Formula 4
+            const f4_total = ["3-10", "3-15", "3-20", "3-25", "3-30"];
+            if (shared_hdp.includes(hdp) && f4_total.includes(total)) {
+                selection = "ဂိုးပေါ်";
+                warning = "၂ သင်းပေါင်း အနည်းဆုံး ၃ လုံးရောက်နိုင်ပေမယ့် ၄ လုံးရောက်ဖို့ အနည်းငယ်လေး ခက်ပါလိမ့်မယ်။ Total Over 2.5 က ဒီပွဲ ပို Safe ဖြစ်ပါတယ်။";
+            }
+
+            // Formula 5
+            const f5_hdp = ["1-20", "1-30", "1-40"];
+            const f5_total = ["3+20", "3+30", "3+40"];
+            if (f5_hdp.includes(hdp) && f5_total.includes(total)) {
+                selection = "ဂိုးပေါ်";
+            }
+
+            // Formula 6
+            const f6_hdp = ["1-80", "1-85", "1-90", "1-95", "1-100"];
+            const f6_total = ["3-80", "3-85", "3-90", "3-95", "3-100"];
+            if (f6_hdp.includes(hdp) && f6_total.includes(total)) {
+                selection = `${favName}, ဂိုးပေါ်`;
+            }
+
+            // Formula 7
+            const f7_hdp = ["-20", "-25", "-30"];
+            const f7_total = ["2-80", "2-85", "2-90", "2-95", "2-100", "3+80", "3+85", "3+90", "3+95", "3+100"];
+            if (f7_hdp.includes(hdp) && f7_total.includes(total)) {
+                selection = "ဂိုးပေါ်";
+            }
+
+            // Formula 8
+            const f8_hdp = ["=", "-5", "-10", "-15", "20", "-25", "-30", "-35", "-40"];
+            const f8_total = ["2=", "2-5", "2-10", "2-15", "2-20", "2-25", "2-30", "2-35", "2-40"];
+            if (f8_hdp.includes(hdp) && f8_total.includes(total)) {
+                selection = "ဂိုးအောက်";
+            }
+
+            // Formula 9
+            const f9_hdp = ["1+50", "1+55", "1+65", "1+75", "1+85", "1+60", "1+70", "1+80", "1+90"];
+            const f9_total = ["2-60", "2-65", "2-70", "2-75", "2-80"];
+            if (f9_hdp.includes(hdp) && f9_total.includes(total)) {
+                selection = "ဂိုးအောက်";
+            }
+
+            // Formula 10
+            const f10_hdp = ["1-70", "1-75", "1-80", "1-85", "1-90", "1-95", "1-100"];
+            const f10_total = ["3=", "3+5", "3+10", "3+15", "3+20", "3+25", "3+30", "3+35", "3+40"];
+            if (f10_hdp.includes(hdp) && f10_total.includes(total)) {
+                selection = "ဂိုးပေါ်";
+            }
+
+            // Formula 11
+            const f11_hdp = ["-40", "-45", "-50", "-55", "-60"];
+            const f11_total = ["3-40", "3-45", "3-50", "3-55", "3-60"];
+            if (f11_hdp.includes(hdp) && f11_total.includes(total)) {
+                selection = "ဂိုးအောက်";
+            }
+
+            // Formula 12 - Updated to "ဂိုးပေါ်"
+            const f12_hdp = ["-40", "-45", "-50", "-55", "-60"];
+            const f12_total = ["3+40", "3+45", "3+50", "3+55", "3+60"];
+            if (f12_hdp.includes(hdp) && f12_total.includes(total)) {
+                selection = "ဂိုးပေါ်";
+            }
+
+            const resultArea = document.getElementById('resultArea');
+            resultArea.classList.remove('hidden');
+            
+            if (selection) {
+                document.getElementById('selectionText').innerHTML = `ရွေးချယ်မှု : <span class="text-red-500">${selection}</span>`;
+                document.getElementById('warningText').innerText = warning;
+            } else {
+                document.getElementById('selectionText').innerHTML = `<span class="text-gray-500 text-sm">ကိုက်ညီသော Formula မရှိပါ။</span>`;
+                document.getElementById('warningText').innerText = "";
+            }
+        };
+
+        // UI Management
         window.handleLogin = () => {
             if (document.getElementById('adminPassword').value === "admin123") {
-                isAdmin = true;
-                localStorage.setItem('onekick_admin', 'true');
-                updateAdminUI();
-                window.hideLoginModal();
-                setupTipsListener();
+                isAdmin = true; localStorage.setItem('onekick_admin', 'true');
+                updateAdminUI(); window.hideLoginModal(); setupTipsListener();
             } else { alert("Access Denied"); }
         };
-
-        window.logoutAdmin = () => {
-            isAdmin = false;
-            localStorage.setItem('onekick_admin', 'false');
-            updateAdminUI();
-            setupTipsListener();
-        };
-
+        window.logoutAdmin = () => { isAdmin = false; localStorage.setItem('onekick_admin', 'false'); updateAdminUI(); setupTipsListener(); };
         window.addTip = async () => {
             if (!isAdmin || !auth.currentUser) return;
             const league = document.getElementById('tipLeague').value.trim();
             const match = document.getElementById('tipMatch').value.trim();
             const pick = document.getElementById('tipPick').value.trim();
             if (!match || !pick) return;
-
             try {
-                await addDoc(tipsCollection, { 
-                    league: league.toUpperCase() || "FOOTBALL", 
-                    match, pick, result: 'pending',
-                    createdAt: serverTimestamp() 
-                });
-                document.getElementById('tipLeague').value = '';
-                document.getElementById('tipMatch').value = '';
-                document.getElementById('tipPick').value = '';
-            } catch (e) { console.error("Add Fail", e); }
+                await addDoc(tipsCollection, { league: league.toUpperCase() || "FOOTBALL", match, pick, result: 'pending', createdAt: serverTimestamp() });
+                document.getElementById('tipLeague').value = ''; document.getElementById('tipMatch').value = ''; document.getElementById('tipPick').value = '';
+            } catch (e) { console.error(e); }
         };
-
         window.updateMatchResult = async (status) => {
             if (!selectedMatchId || !isAdmin) return;
-            try {
-                const matchDoc = doc(db, 'artifacts', appId, 'public', 'data', 'daily_tips', selectedMatchId);
-                await updateDoc(matchDoc, { result: status });
-                window.closeResultModal();
-            } catch (e) { console.error("Update Fail", e); }
+            try { await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'daily_tips', selectedMatchId), { result: status }); window.closeResultModal(); }
+            catch (e) { console.error(e); }
         };
-
-        window.deleteTip = async (id) => {
-            if (isAdmin && confirm("Confirm Delete?")) {
-                try { await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'daily_tips', id)); }
-                catch (e) { console.error("Del Fail", e); }
-            }
-        };
-
-        window.switchTipView = (view) => {
-            activeTipView = view;
-            const tabCurrent = document.getElementById('tabCurrent');
-            const tabHistory = document.getElementById('tabHistory');
-            const activeStyle = 'flex-1 py-3 text-[10px] uppercase font-black tracking-widest rounded-xl bg-red-600 text-white transition-all';
-            const inactiveStyle = 'flex-1 py-3 text-[10px] uppercase font-black tracking-widest rounded-xl text-gray-500 transition-all';
-            if (tabCurrent) tabCurrent.className = (view === 'current') ? activeStyle : inactiveStyle;
-            if (tabHistory) tabHistory.className = (view === 'history') ? activeStyle : inactiveStyle;
-            setupTipsListener();
-        };
-
-        window.openResultModal = (id) => { selectedMatchId = id; document.getElementById('resultModal').classList.remove('hidden'); };
-        window.closeResultModal = () => { selectedMatchId = null; document.getElementById('resultModal').classList.add('hidden'); };
-        window.showLoginModal = () => document.getElementById('loginModal').classList.remove('hidden');
-        window.hideLoginModal = () => document.getElementById('loginModal').classList.add('hidden');
-        
+        window.deleteTip = async (id) => { if (isAdmin && confirm("Confirm Delete?")) { try { await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'daily_tips', id)); } catch (e) { console.error(e); } } };
+        window.switchTipView = (view) => { activeTipView = view; setupTipsListener(); };
         window.switchPage = (page) => {
             document.getElementById('botPage').classList.toggle('hidden', page !== 'bot');
             document.getElementById('tipsPage').classList.toggle('hidden', page !== 'tips');
@@ -465,17 +495,10 @@
             document.getElementById('navTips').classList.toggle('active', page === 'tips');
             if (page === 'tips') setupTipsListener();
         };
-
-        window.calculatePrediction = () => {
-            const hdp = document.getElementById('hdpInput').value.trim();
-            const total = document.getElementById('totalInput').value.trim();
-            let selection = "Formula Error: Data not found.";
-            if (hdp === "-10" && total === "3+20") selection = "Over (ဂိုးပေါ်)";
-            if (hdp === "-20" && total === "2-80") selection = "Over (ဂိုးပေါ်)";
-            document.getElementById('resultArea').classList.remove('hidden');
-            document.getElementById('selectionText').innerHTML = `Selection: <span class="text-red-500">${selection}</span>`;
-        };
-
+        window.openResultModal = (id) => { selectedMatchId = id; document.getElementById('resultModal').classList.remove('hidden'); };
+        window.closeResultModal = () => { selectedMatchId = null; document.getElementById('resultModal').classList.add('hidden'); };
+        window.showLoginModal = () => document.getElementById('loginModal').classList.remove('hidden');
+        window.hideLoginModal = () => document.getElementById('loginModal').classList.add('hidden');
         window.onload = startApp;
     </script>
 </body>
